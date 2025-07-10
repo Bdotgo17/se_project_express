@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 // filepath: /Users/adam/se_project_express/controllers/clothingItems.js
 const ClothingItem = require("../models/clothingItem");
 const {
@@ -39,6 +41,13 @@ const createClothingItem = async (req, res) => {
 
 // DELETE /items/:itemId - deletes a clothing item by ID
 const deleteClothingItem = async (req, res) => {
+  const { itemId } = req.params;
+  console.log("Request params:", req.params);
+
+  if (!mongoose.Types.ObjectId.isValid(itemId)) {
+    return res.status(400).json({ message: "Invalid item ID" });
+  }
+
   try {
     const item = await ClothingItem.findById(req.params.itemId).orFail(() => {
       const error = new Error("Clothing item not found");
