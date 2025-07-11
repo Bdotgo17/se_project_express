@@ -40,36 +40,26 @@ const createClothingItem = async (req, res) => {
 };
 
 // DELETE /items/:itemId - deletes a clothing item by ID
-const deleteClothingItem = async (req, res) => {
+const deleteClothingItem = (req, res) => {
   const { itemId } = req.params;
-  console.log("Request params:", req.params);
 
+  // Validate the itemId
   if (!mongoose.Types.ObjectId.isValid(itemId)) {
     return res.status(400).json({ message: "Invalid item ID" });
   }
 
-  try {
-    const item = await ClothingItem.findById(req.params.itemId).orFail(() => {
-      const error = new Error("Clothing item not found");
-      error.statusCode = NOT_FOUND;
-      throw error;
+  // Find and delete the item
+  ClothingItem.findByIdAndDelete(itemId)
+    .then((item) => {
+      if (!item) {
+        return res.status(404).json({ message: "Item not found" });
+      }
+      res.json({ message: "Item deleted" });
+    })
+    .catch((err) => {
+      console.error("Error deleting item:", err);
+      res.status(500).json({ message: "Server error" });
     });
-    await item.deleteOne();
-    return res
-      .status(200)
-      .send({ message: "Clothing item deleted successfully" });
-  } catch (err) {
-    console.error(err);
-    if (err.name === "CastError") {
-      return res.status(BAD_REQUEST).send({ message: "Invalid item ID" });
-    }
-    if (err.statusCode === NOT_FOUND) {
-      return res.status(NOT_FOUND).send({ message: "Clothing item not found" });
-    }
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .send({ message: "An error has occurred on the server" });
-  }
 };
 
 // PUT /items/:itemId/likes — like an item

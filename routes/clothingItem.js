@@ -3,7 +3,7 @@ const {
   getClothingItems,
   createClothingItem,
   deleteClothingItem,
-  likeItem, // Import the likeItem controller
+  likeItem,
   dislikeItem,
   getItemLikes,
 } = require("../controllers/clothingItem");
@@ -11,20 +11,20 @@ const {
 const router = express.Router();
 
 // Route for fetching all clothing items
-router.get("/", getClothingItems);
+router.get("/items", getClothingItems);
 
 // Route for creating a new clothing item
-router.post("/", createClothingItem);
+router.post("/items", createClothingItem);
 
 // Route for deleting a clothing item by ID
-router.delete("/:itemId", deleteClothingItem);
+router.delete("/items/:itemId", deleteClothingItem);
 // Route for liking an item
-router.put("/:itemId/likes", likeItem);
+router.put("/items/:itemId/likes", likeItem);
 
 // Route for unliking an item
-router.delete("/:itemId/likes", dislikeItem);
+router.delete("/items/:itemId/likes", dislikeItem);
 
 // Route for getting likes of a specific item
-router.get("/:itemId/likes", getItemLikes);
+router.get("/items/:itemId/likes", getItemLikes);
 
 module.exports = router;

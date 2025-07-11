@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const routes = require("./routes");
+const clothingItemRoutes = require("./routes/clothingItem"); // Import clothing item routes
 
 const { PORT = 3001 } = process.env;
 const app = express();
@@ -8,7 +9,10 @@ const app = express();
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
   .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("Failed to connect to MongoDB", err));
+  .catch((err) => {
+    console.error("Failed to connect to MongoDB", err);
+    process.exit(1); // Exit the application if the database connection fails
+  });
 
 app.use(express.json());
 
@@ -20,7 +24,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(routes);
+// Connect clothing item routes
+app.use("/", clothingItemRoutes);
 
 app.use((req, res) => {
   res.status(404).send({ message: "Requested resource not found" });
