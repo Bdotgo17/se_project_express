@@ -1,3 +1,5 @@
+const mongoose = require("mongoose"); // Add this line
+
 const User = require("../models/user");
 const {
   BAD_REQUEST,
@@ -7,12 +9,21 @@ const {
 
 // GET /users - returns all users
 const getUsers = async (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
+    return res.status(400).send({ message: "Invalid user ID" });
+  }
   try {
-    const users = await User.find();
-    res.status(200).send(users);
+    const user = await User.findById(req.params.userId).orFail(() => {
+      const error = new Error("User not found");
+      error.statusCode = NOT_FOUND;
+      throw error;
+    });
+    return res.status(200).send(user);
   } catch (err) {
     console.error(err);
-    res.status(INTERNAL_SERVER_ERROR).send({ message: 'Error fetching users' });
+    return res
+      .status(INTERNAL_SERVER_ERROR)
+      .send({ message: "Error fetching users" });
   }
 };
 
