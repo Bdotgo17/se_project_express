@@ -49,16 +49,16 @@ const deleteClothingItem = (req, res) => {
   }
 
   // Find and delete the item
-  ClothingItem.findByIdAndDelete(itemId)
+  return ClothingItem.findByIdAndDelete(itemId)
     .then((item) => {
       if (!item) {
         return res.status(404).json({ message: "Item not found" });
       }
-      res.json({ message: "Item deleted" });
+      return res.json({ message: "Item deleted" });
     })
     .catch((err) => {
       console.error("Error deleting item:", err);
-      res.status(500).json({ message: "Server error" });
+      return res.status(500).json({ message: "Server error" });
     });
 };
 

@@ -1,6 +1,5 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const routes = require("./routes");
 const clothingItemRoutes = require("./routes/clothingItem"); // Import clothing item routes
 
 const { PORT = 3001 } = process.env;
