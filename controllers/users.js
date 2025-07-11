@@ -8,32 +8,6 @@ const {
 } = require("../utils/errors");
 
 // GET /users - returns all users
-// const getUsers = async (req, res) => {
-//   return res.status(NOT_FOUND).send({ message {
-//     if (!mongoose.Types.ObjectId.isValid(req.params: "User not found" });
-//   }
-//   if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
-//     return res.status(400).send({ message: "Invalid user ID" });
-//   }
-//   try {
-//     const user = await User.findById(req.params.userId).orFail(() => {
-//       const error = new Error("User not found");
-//       error.statusCode = NOT_FOUND;
-//       throw error;
-//     });
-//     return res.status(200).send(user);
-//   } catch (err) {
-//     console.error(err);
-//     if (err.statusCode === NOT_FOUND) {
-//       return res.status(NOT_FOUND).send({ message: "User not found" });
-//     }
-//     return res
-//       .status(INTERNAL_SERVER_ERROR)
-//       .send({ message: "An error has occurred on the server" });
-//   }
-// };
-
-// GET /users - returns all users
 const getUsers = async (req, res) => {
   try {
     const users = await User.find({});
@@ -45,34 +19,6 @@ const getUsers = async (req, res) => {
       .send({ message: "An error has occurred on the server" });
   }
 };
-
-// GET /users/:userId - returns a user by _id
-// const getUser = async (req, res) => {
-//   if (!mongoose.Types.ObjectId.isValid(req.params.userId)) {
-//     return res
-//       .status(400)
-//       .send({ message: "Invalid- In controllers/users.js user ID" });
-//   }
-//   try {
-//     const user = await User.findById(req.params.userId).orFail(() => {
-//       const error = new Error("User not found");
-//       error.statusCode = NOT_FOUND;
-//       throw error;
-//     });
-//     return res.status(200).send(user);
-//   } catch (err) {
-//     console.error(err);
-//     if (err.name === "CastError") {
-//       return res.status(BAD_REQUEST).send({ message: "Invalid user ID" });
-//     }
-//     if (err.statusCode === NOT_FOUND) {
-//       return res.status(NOT_FOUND).send({ message: "User not found" });
-//     }
-//     return res
-//       .status(INTERNAL_SERVER_ERROR)
-//       .send({ message: "An error has occurred on the server" });
-//   }
-// };
 
 // GET /users/:userId - returns a user by ID
 const getUser = async (req, res) => {
