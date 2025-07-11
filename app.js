@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const clothingItemRoutes = require("./routes/clothingItem"); // Import clothing item routes
+const userRoutes = require("./routes/users"); // Import the users routes
 
 const { PORT = 3001 } = process.env;
 const app = express();
@@ -22,6 +23,9 @@ app.use((req, res, next) => {
   };
   next();
 });
+
+// Connect the users routes
+app.use("/users", userRoutes);
 
 // Connect clothing item routes
 app.use("/", clothingItemRoutes);
