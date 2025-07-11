@@ -73,6 +73,7 @@ const getUsers = async (req, res) => {
 //       .send({ message: "An error has occurred on the server" });
 //   }
 // };
+
 // GET /users/:userId - returns a user by ID
 const getUser = async (req, res) => {
   const { userId } = req.params;
