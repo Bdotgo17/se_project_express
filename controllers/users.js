@@ -21,9 +21,12 @@ const getUsers = async (req, res) => {
     return res.status(200).send(user);
   } catch (err) {
     console.error(err);
+    if (err.statusCode === NOT_FOUND) {
+      return res.status(NOT_FOUND).send({ message: "User not found" });
+    }
     return res
       .status(INTERNAL_SERVER_ERROR)
-      .send({ message: "Error fetching users" });
+      .send({ message: "An error has occurred on the server" });
   }
 };
 
