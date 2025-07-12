@@ -5,13 +5,15 @@ const {
   BAD_REQUEST,
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
+  OK,
+  CREATED,
 } = require("../utils/errors");
 
 // GET /users - returns all users
 const getUsers = async (req, res) => {
   try {
     const users = await User.find({});
-    return res.status(200).send(users);
+    return res.status(OK).send(users);
   } catch (err) {
     console.error("Error fetching users:", err);
     return res
@@ -35,7 +37,7 @@ const getUser = async (req, res) => {
       error.statusCode = NOT_FOUND;
       throw error;
     });
-    return res.status(200).send(user);
+    return res.status(OK).send(user);
   } catch (err) {
     console.error("Error fetching user:", err);
 
@@ -54,10 +56,16 @@ const createUser = async (req, res) => {
   try {
     const { name, avatar } = req.body;
     const user = await User.create({ name, avatar });
-    res.status(201).send(user);
+    return res.status(CREATED).send(user);
   } catch (err) {
     console.error(err);
-    res.status(400).send({ message: "Error creating user" });
+
+    // Handle validation errors
+    if (err.name === "ValidationError") {
+      return res.status(NOT_FOUND).send({ message: "Invalid data passed" });
+    }
+
+    return res.status(BAD_REQUEST).send({ message: "Error creating user" });
   }
 };
 

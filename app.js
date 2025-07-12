@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const clothingItemRoutes = require("./routes/clothingItem"); // Import clothing item routes
 const userRoutes = require("./routes/users"); // Import the users routes
+const { NOT_FOUND } = require("./utils/errors");
 
 const { PORT = 3001 } = process.env;
 const app = express();
@@ -31,7 +32,7 @@ app.use("/users", userRoutes);
 app.use("/", clothingItemRoutes);
 
 app.use((req, res) => {
-  res.status(404).send({ message: "Requested resource not found" });
+  res.status(NOT_FOUND).send({ message: "Requested resource not found" });
 });
 
 app.listen(PORT, () => {

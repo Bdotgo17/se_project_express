@@ -7,3 +7,9 @@ The back-end project is focused on creating a server for the WTWR application. Y
 
 ### Testing
 Before committing your code, make sure you edit the file `sprint.txt` in the root folder. The file `sprint.txt` should contain the number of the sprint you're currently working on. For ex. 12
+
+1. This project's name is SE_PROJECT_EXPRESS
+
+2. This project uses an api to run tests against Postman and Github.
+
+3. This project uses api, Postman and Github and Compass from Mongoose. 

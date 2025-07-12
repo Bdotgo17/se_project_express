@@ -5,7 +5,6 @@ const {
   deleteClothingItem,
   likeItem,
   dislikeItem,
-  getItemLikes,
 } = require("../controllers/clothingItem");
 
 const router = express.Router();
@@ -23,8 +22,5 @@ router.put("/items/:itemId/likes", likeItem);
 
 // Route for unliking an item
 router.delete("/items/:itemId/likes", dislikeItem);
-
-// Route for getting likes of a specific item
-router.get("/items/:itemId/likes", getItemLikes);
 
 module.exports = router;
