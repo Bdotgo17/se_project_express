@@ -62,7 +62,7 @@ const createUser = async (req, res) => {
 
     // Handle validation errors
     if (err.name === "ValidationError") {
-      return res.status(NOT_FOUND).send({ message: "Invalid data passed" });
+      return res.status(BAD_REQUEST).send({ message: "Invalid data passed" });
     }
 
     return res.status(BAD_REQUEST).send({ message: "Error creating user" });
