@@ -41,6 +41,11 @@ const getUser = async (req, res) => {
   } catch (err) {
     console.error("Error fetching user:", err);
 
+    // Handle CastError for invalid ObjectId
+    if (err.name === "CastError") {
+      return res.status(BAD_REQUEST).send({ message: "Invalid user ID" });
+    }
+
     if (err.statusCode === NOT_FOUND) {
       return res.status(NOT_FOUND).send({ message: "User not found" });
     }
@@ -54,8 +59,8 @@ const getUser = async (req, res) => {
 // POST /users - creates a new user
 const createUser = async (req, res) => {
   try {
-    const { name, avatar } = req.body;
-    const user = await User.create({ name, avatar });
+    const { name, email } = req.body;
+    const user = await User.create({ name, email });
     return res.status(CREATED).send(user);
   } catch (err) {
     console.error(err);
@@ -65,7 +70,9 @@ const createUser = async (req, res) => {
       return res.status(BAD_REQUEST).send({ message: "Invalid data passed" });
     }
 
-    return res.status(BAD_REQUEST).send({ message: "Error creating user" });
+    return res
+      .status(INTERNAL_SERVER_ERROR)
+      .send({ message: "Error creating user" });
   }
 };
 

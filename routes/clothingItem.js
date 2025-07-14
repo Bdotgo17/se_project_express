@@ -10,17 +10,17 @@ const {
 const router = express.Router();
 
 // Route for fetching all clothing items
-router.get("/items", getClothingItems);
+router.get("/", getClothingItems);
 
 // Route for creating a new clothing item
-router.post("/items", createClothingItem);
+router.post("/", createClothingItem);
 
 // Route for deleting a clothing item by ID
-router.delete("/items/:itemId", deleteClothingItem);
+router.delete("/:itemId", deleteClothingItem);
 // Route for liking an item
-router.put("/items/:itemId/likes", likeItem);
+router.put("/:itemId/likes", likeItem);
 
 // Route for unliking an item
-router.delete("/items/:itemId/likes", dislikeItem);
+router.delete("/:itemId/likes", dislikeItem);
 
 module.exports = router;

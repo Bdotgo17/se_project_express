@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const routes = require("./routes"); // Import centralized routes
 const clothingItemRoutes = require("./routes/clothingItem"); // Import clothing item routes
 const userRoutes = require("./routes/users"); // Import the users routes
 const { NOT_FOUND } = require("./utils/errors");
@@ -8,7 +9,10 @@ const { PORT = 3001 } = process.env;
 const app = express();
 
 mongoose
-  .connect("mongodb://127.0.0.1:27017/wtwr_db")
+  .connect("mongodb://127.0.0.1:27017/wtwr_db", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => {
     console.error("Failed to connect to MongoDB", err);
@@ -25,11 +29,13 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use("/", routes); // Use the centralized routes
+
 // Connect the users routes
 app.use("/users", userRoutes);
 
 // Connect clothing item routes
-app.use("/", clothingItemRoutes);
+app.use("/clothing-items", clothingItemRoutes);
 
 app.use((req, res) => {
   res.status(NOT_FOUND).send({ message: "Requested resource not found" });

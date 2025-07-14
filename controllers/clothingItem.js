@@ -9,6 +9,7 @@ const {
   OK,
   CREATED,
 } = require("../utils/errors");
+// Removed duplicate import of NOT_FOUND
 
 const getClothingItems = async (req, res) => {
   try {
@@ -72,9 +73,11 @@ const deleteClothingItem = (req, res) => {
 };
 // PUT /items/:itemId/likes — like an item
 const likeItem = async (req, res) => {
+  const { itemId } = req.params;
+
   try {
     const item = await ClothingItem.findByIdAndUpdate(
-      req.params.itemId,
+      itemId,
       { $addToSet: { likes: req.user._id } }, // Add user ID to likes array if not already present
       { new: true } // Return the updated document
     ).orFail(() => {
