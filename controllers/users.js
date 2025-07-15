@@ -1,5 +1,6 @@
 const mongoose = require("mongoose"); // Add this line
 
+const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const {
   BAD_REQUEST,
@@ -59,11 +60,28 @@ const getUser = async (req, res) => {
 // POST /users - creates a new user
 const createUser = async (req, res) => {
   try {
-    const { name, email } = req.body;
-    const user = await User.create({ name, email });
-    return res.status(CREATED).send(user);
+    const { name, email, password } = req.body;
+
+    // Hash the password before saving it to the database
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({ name, email, password: hashedPassword });
+
+    // Return the user without the password field
+    return res.status(CREATED).send({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+    });
   } catch (err) {
-    console.error(err);
+    console.error("Error creating user:", err);
+
+    // Handle duplicate email error
+    if (err.code === 11000) {
+      return res
+        .status(400)
+        .send({ message: "User with this email already exists" });
+    }
 
     // Handle validation errors
     if (err.name === "ValidationError") {

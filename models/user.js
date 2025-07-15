@@ -12,12 +12,17 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
+    unique: true, // Ensure the email is unique
     validate: {
-      validator(value) {
-        return validator.isURL(value);
-      },
-      message: "You must enter a valid URL",
+      validator: (value) => validator.isEmail(value), // Use validator to check email format
+      message: "Invalid email format",
     },
+  },
+  password: {
+    type: String,
+    required: true, // Password is required
+    minlength: 8, // Optional: Enforce a minimum password length
+    select: false, // Prevent the password from being returned in queries by default
   },
 });
 
