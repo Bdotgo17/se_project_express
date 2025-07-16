@@ -1,5 +1,6 @@
 // filepath: /Users/adam/se_project_express/models/user.js
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const validator = require("validator");
 
 const userSchema = new mongoose.Schema({
@@ -25,5 +26,24 @@ const userSchema = new mongoose.Schema({
     select: false, // Prevent the password from being returned in queries by default
   },
 });
+
+// Custom method to find user by credentials
+userSchema.statics.findUserByCredentials = async function (email, password) {
+  const user = await this.findOne({ email }).select("+password"); // Explicitly select the password field
+  if (!user) {
+    const error = new Error("Invalid email or password");
+    error.name = "UnauthorizedError";
+    throw error;
+  }
+
+  const isPasswordMatch = await bcrypt.compare(password, user.password);
+  if (!isPasswordMatch) {
+    const error = new Error("Invalid email or password");
+    error.name = "UnauthorizedError";
+    throw error;
+  }
+
+  return user;
+};
 
 module.exports = mongoose.model("User", userSchema);

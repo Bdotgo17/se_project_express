@@ -1,14 +1,53 @@
 const mongoose = require("mongoose"); // Add this line
 
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
 const {
   BAD_REQUEST,
+  UNAUTHORIZED,
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
   OK,
   CREATED,
 } = require("../utils/errors");
+const { JWT_SECRET } = require("../utils/config"); // Import the secret key
+
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Check if email and password are provided
+    if (!email || !password) {
+      return res
+        .status(BAD_REQUEST)
+        .send({ message: "Email and password are required" });
+    }
+
+    // Find the user by email and validate the password
+    const user = await User.findUserByCredentials(email, password);
+
+    // Create a JWT token
+    const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" });
+
+    // Send the token in the response body
+    return res.status(200).send({ token });
+  } catch (err) {
+    console.error("Error during login:", err);
+
+    // Handle authentication errors
+    if (err.name === "UnauthorizedError") {
+      return res
+        .status(UNAUTHORIZED)
+        .send({ message: "Invalid email or password" });
+    }
+
+    // Handle all other errors
+    return res
+      .status(INTERNAL_SERVER_ERROR)
+      .send({ message: "An error has occurred on the server" });
+  }
+};
 
 // GET /users - returns all users
 const getUsers = async (req, res) => {
@@ -94,4 +133,4 @@ const createUser = async (req, res) => {
   }
 };
 
-module.exports = { getUsers, getUser, createUser };
+module.exports = { getUsers, getUser, createUser, login };
