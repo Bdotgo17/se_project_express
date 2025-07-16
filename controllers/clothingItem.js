@@ -71,6 +71,7 @@ const deleteClothingItem = (req, res) => {
         .json({ message: "Server error" });
     });
 };
+
 // PUT /items/:itemId/likes — like an item
 const likeItem = async (req, res) => {
   const { itemId } = req.params;

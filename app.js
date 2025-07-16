@@ -4,6 +4,8 @@ const routes = require("./routes"); // Import centralized routes
 const clothingItemRoutes = require("./routes/clothingItem"); // Import clothing item routes
 const userRoutes = require("./routes/users"); // Import the users routes
 const { NOT_FOUND } = require("./utils/errors");
+const auth = require("./middlewares/auth");
+const { login, createUser } = require("./controllers/users"); // Import controllers
 
 const { PORT = 3001 } = process.env;
 const app = express();
@@ -29,13 +31,17 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/", routes); // Use the centralized routes
+// Add routes for signing in and signing up
+app.post("/signin", login);
+app.post("/signup", createUser);
 
 // Connect the users routes
+app.use(auth); // Apply the auth middleware to all routes below this line
 app.use("/users", userRoutes);
-
-// Connect clothing item routes
 app.use("/clothing-items", clothingItemRoutes);
+
+// Centralized routes
+app.use("/", routes);
 
 app.use((req, res) => {
   res.status(NOT_FOUND).send({ message: "Requested resource not found" });
@@ -44,3 +50,5 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+module.exports = app;
