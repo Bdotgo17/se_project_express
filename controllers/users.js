@@ -6,7 +6,6 @@ const User = require("../models/user");
 const {
   BAD_REQUEST,
   UNAUTHORIZED,
-  CONFLICT,
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
   OK,
@@ -63,39 +62,60 @@ const getUsers = async (req, res) => {
   }
 };
 
-// GET /users/:userId - returns a user by ID
-const getUser = async (req, res) => {
-  const { userId } = req.params;
-
-  // Validate the userId format
-  if (!mongoose.Types.ObjectId.isValid(userId)) {
-    return res.status(BAD_REQUEST).send({ message: "Invalid user ID" });
-  }
-
+// GET /users/me - returns the current user
+const getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(userId).orFail(() => {
-      const error = new Error("User not found");
-      error.statusCode = NOT_FOUND;
-      throw error;
-    });
-    return res.status(OK).send(user);
-  } catch (err) {
-    console.error("Error fetching user:", err);
+    // Access the user ID from the req.user object (set by the auth middleware)
+    const userId = req.user._id;
 
-    // Handle CastError for invalid ObjectId
-    if (err.name === "CastError") {
-      return res.status(BAD_REQUEST).send({ message: "Invalid user ID" });
+    // Find the user by their ID
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(NOT_FOUND).send({ message: "User not found" });
     }
 
-    if (err.statusCode === NOT_FOUND) {
+    // Return the current user's data
+    return res.status(OK).send(user);
+  } catch (err) {
+    console.error("Error fetching current user:", err);
+    return res
+      .status(INTERNAL_SERVER_ERROR)
+      .send({ message: "An error occurred on the server" });
+  }
+};
+
+const updateUser = async (req, res) => {
+  const { name, avatar } = req.body;
+  const userId = req.user._id; // Get the user ID from the auth middleware
+
+  try {
+    // Update the user and enable validation
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { name, avatar },
+      { new: true, runValidators: true } // Return the updated document and enable validation
+    );
+
+    if (!updatedUser) {
       return res.status(NOT_FOUND).send({ message: "User not found" });
+    }
+
+    return res.status(OK).send(updatedUser);
+  } catch (err) {
+    console.error("Error updating user:", err);
+
+    // Handle validation errors
+    if (err.name === "ValidationError") {
+      return res.status(BAD_REQUEST).send({ message: "Invalid data passed" });
     }
 
     return res
       .status(INTERNAL_SERVER_ERROR)
-      .send({ message: "An error has occurred on the server" });
+      .send({ message: "An error occurred on the server" });
   }
 };
+
 
 // POST /users - creates a new user
 const createUser = async (req, res) => {
@@ -134,4 +154,4 @@ const createUser = async (req, res) => {
   }
 };
 
-module.exports = { getUsers, getUser, createUser, login };
+module.exports = { getUsers, getCurrentUser, createUser, login, updateUser };

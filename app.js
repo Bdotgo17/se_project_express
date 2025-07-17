@@ -23,14 +23,6 @@ mongoose
 
 app.use(express.json());
 
-// Temporary authorization middleware
-app.use((req, res, next) => {
-  req.user = {
-    _id: "686da17fea375d6b292decb8", // Replace with the _id of the test user you created
-  };
-  next();
-});
-
 // Add routes for signing in and signing up
 app.post("/signin", login);
 app.post("/signup", createUser);
