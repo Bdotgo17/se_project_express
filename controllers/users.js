@@ -1,5 +1,3 @@
-const mongoose = require("mongoose"); // Add this line
-
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
@@ -117,7 +115,6 @@ const updateUser = async (req, res) => {
   }
 };
 
-
 // POST /users - creates a new user
 const createUser = async (req, res) => {
   try {
@@ -166,7 +163,9 @@ const getUserItems = async (req, res) => {
     const items = await ClothingItem.find({ owner: userId });
 
     if (!items || items.length === 0) {
-      return res.status(NOT_FOUND).send({ message: "No items found for this user" });
+      return res
+        .status(NOT_FOUND)
+        .send({ message: "No items found for this user" });
     }
 
     return res.status(200).send(items);
@@ -178,4 +177,11 @@ const getUserItems = async (req, res) => {
   }
 };
 
-module.exports = { getUsers, getCurrentUser, createUser, login, updateUser, getUserItems };
+module.exports = {
+  getUsers,
+  getCurrentUser,
+  createUser,
+  login,
+  updateUser,
+  getUserItems,
+};
