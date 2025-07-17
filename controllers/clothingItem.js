@@ -8,6 +8,7 @@ const {
   INTERNAL_SERVER_ERROR,
   OK,
   CREATED,
+  FORBIDDEN,
 } = require("../utils/errors");
 // Removed duplicate import of NOT_FOUND
 
@@ -43,33 +44,42 @@ const createClothingItem = async (req, res) => {
 };
 
 // DELETE /items/:itemId - deletes a clothing item by ID
-const deleteClothingItem = (req, res) => {
+const deleteClothingItem = async (req, res) => {
   const { itemId } = req.params;
+  const userId = req.user._id; // Get the logged-in user's ID from the auth middleware
 
   // Validate the itemId
   if (!mongoose.Types.ObjectId.isValid(itemId)) {
     return res.status(BAD_REQUEST).json({ message: "Invalid item ID" });
   }
 
-  // Find and delete the item
-  return ClothingItem.findByIdAndDelete(itemId)
-    .then((item) => {
-      if (!item) {
-        return res.status(NOT_FOUND).json({ message: "Item not found" });
-      }
-      return res.status(OK).json({ message: "Item deleted" });
-    })
-    .catch((err) => {
-      console.error("Error deleting item:", err);
+  try {
+    // Find the item by ID
+    const item = await ClothingItem.findById(itemId);
 
-      if (err.name === "CastError") {
-        return res.status(BAD_REQUEST).json({ message: "Invalid item ID" });
-      }
+    if (!item) {
+      return res.status(NOT_FOUND).json({ message: "Item not found" });
+    }
 
+    // Check if the logged-in user is the owner of the item
+    if (item.owner.toString() !== userId) {
       return res
-        .status(INTERNAL_SERVER_ERROR)
-        .json({ message: "Server error" });
-    });
+        .status(FORBIDDEN)
+        .json({ message: "You do not have permission to delete this item" });
+    }
+
+    // If the user is the owner, delete the item
+    await item.deleteOne();
+    return res.status(OK).json({ message: "Item deleted" });
+  } catch (err) {
+    console.error("Error deleting item:", err);
+
+    if (err.name === "CastError") {
+      return res.status(BAD_REQUEST).json({ message: "Invalid item ID" });
+    }
+
+    return res.status(INTERNAL_SERVER_ERROR).json({ message: "Server error" });
+  }
 };
 
 // PUT /items/:itemId/likes — like an item

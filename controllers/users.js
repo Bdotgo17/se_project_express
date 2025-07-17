@@ -12,6 +12,7 @@ const {
   CREATED,
 } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config"); // Import the secret key
+const ClothingItem = require("../models/clothingItem");
 
 const login = async (req, res) => {
   try {
@@ -127,6 +128,10 @@ const createUser = async (req, res) => {
 
     const user = await User.create({ name, email, password: hashedPassword });
 
+    // Remove the password field from the response
+    const userWithoutPassword = user.toObject();
+    delete userWithoutPassword.password;
+
     // Return the user without the password field
     return res.status(CREATED).send({
       _id: user._id,
@@ -154,4 +159,23 @@ const createUser = async (req, res) => {
   }
 };
 
-module.exports = { getUsers, getCurrentUser, createUser, login, updateUser };
+const getUserItems = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const items = await ClothingItem.find({ owner: userId });
+
+    if (!items || items.length === 0) {
+      return res.status(NOT_FOUND).send({ message: "No items found for this user" });
+    }
+
+    return res.status(200).send(items);
+  } catch (err) {
+    console.error("Error fetching user items:", err);
+    return res
+      .status(INTERNAL_SERVER_ERROR)
+      .send({ message: "An error occurred on the server" });
+  }
+};
+
+module.exports = { getUsers, getCurrentUser, createUser, login, updateUser, getUserItems };

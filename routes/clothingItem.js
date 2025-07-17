@@ -6,6 +6,7 @@ const {
   likeItem,
   dislikeItem,
 } = require("../controllers/clothingItem");
+const auth = require("../middlewares/auth");
 
 const router = express.Router();
 
@@ -16,7 +17,7 @@ router.get("/", getClothingItems);
 router.post("/", createClothingItem);
 
 // Route for deleting a clothing item by ID
-router.delete("/:itemId", deleteClothingItem);
+router.delete("/:itemId", auth, deleteClothingItem);
 // Route for liking an item
 router.put("/:itemId/likes", likeItem);
 

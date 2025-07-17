@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const routes = require("./routes"); // Import centralized routes
 const clothingItemRoutes = require("./routes/clothingItem"); // Import clothing item routes
 const userRoutes = require("./routes/users"); // Import the users routes
@@ -21,6 +22,7 @@ mongoose
     process.exit(1); // Exit the application if the database connection fails
   });
 
+app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 
 // Add routes for signing in and signing up

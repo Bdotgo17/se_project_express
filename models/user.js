@@ -25,6 +25,10 @@ const userSchema = new mongoose.Schema({
     minlength: 8, // Optional: Enforce a minimum password length
     select: false, // Prevent the password from being returned in queries by default
   },
+  avatar: {
+    type: String,
+    required: false,
+  },
 });
 
 // Custom method to find user by credentials
