@@ -21,7 +21,7 @@ const auth = (req, res, next) => {
     req.user = decoded;
 
     // Call the next middleware
-    next();
+    return next();
   } catch (err) {
     // Return a 401 error if the token is invalid
     return res.status(UNAUTHORIZED).send({ message: "Invalid token" });
