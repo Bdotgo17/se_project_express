@@ -25,6 +25,11 @@ mongoose
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 
+// Example protected route
+app.get("/protected-route", auth, (req, res) => {
+  res.send({ message: "Access granted", userId: req.user._id });
+});
+
 // Add routes for signing in and signing up
 app.post("/signin", login);
 app.post("/signup", createUser);
