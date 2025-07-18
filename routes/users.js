@@ -1,11 +1,10 @@
 const express = require("express");
+const auth = require("../middlewares/auth");
 const {
   getUsers,
   getCurrentUser,
   updateUser,
-  getUserItems,
 } = require("../controllers/users");
-const auth = require("../middlewares/auth");
 
 const router = express.Router();
 
@@ -17,8 +16,5 @@ router.get("/me", auth, getCurrentUser);
 
 // Route to update the current user's profile
 router.patch("/me", auth, updateUser);
-
-// Route to get items for a specific user
-router.get("/:userId/items", auth, getUserItems);
 
 module.exports = router;

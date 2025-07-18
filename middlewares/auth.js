@@ -4,18 +4,27 @@ const { JWT_SECRET } = require("../utils/config");
 
 const auth = (req, res, next) => {
   try {
-  const { authorization } = req.headers;
+    const { authorization } = req.headers;
 
-  // Check if the authorization header exists and starts with "Bearer "
-  if (!authorization || !authorization.startsWith("Bearer ")) {
-    return res.status(UNAUTHORIZED).send({ message: "Authorization required" });
-  }
+    // Check if the authorization header exists and starts with "Bearer "
+    if (!authorization || !authorization.startsWith("Bearer ")) {
+      return res
+        .status(UNAUTHORIZED)
+        .send({ message: "Authorization required" });
+    }
 
-  // Extract the token from the header
-  const token = authorization.replace("Bearer ", "");
+    // Extract the token from the header
+    const token = authorization.replace("Bearer ", "");
 
-  // Verify the token
-  const decoded = jwt.verify(token, JWT_SECRET);
+    // Verify the token
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    // Ensure the decoded token contains the required fields
+    if (!decoded || !decoded._id) {
+      return res
+        .status(UNAUTHORIZED)
+        .send({ message: "Invalid token payload" });
+    }
 
     // Attach the payload to the request object
     req.user = decoded;
@@ -28,4 +37,4 @@ const auth = (req, res, next) => {
   }
 };
 
-module.exports = auth;
+module.exports = auth ;

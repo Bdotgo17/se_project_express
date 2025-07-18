@@ -31,6 +31,21 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+// Pre-save hook to hash the password before saving
+userSchema.pre("save", async function preSaveHook(next) {
+  if (!this.isModified("password")) {
+    return next(); // Skip hashing if the password hasn't changed
+  }
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (err) {
+    next(err); // Pass the error to the next middleware
+  }
+});
+
 // Custom method to find user by credentials
 userSchema.statics.findUserByCredentials = async function (email, password) {
   const user = await this.findOne({ email }).select("+password"); // Explicitly select the password field
