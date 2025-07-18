@@ -40,9 +40,9 @@ userSchema.pre("save", async function preSaveHook(next) {
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
-    next();
+    return next();
   } catch (err) {
-    next(err); // Pass the error to the next middleware
+    return next(err); // Pass the error to the next middleware
   }
 });
 
