@@ -8,12 +8,14 @@ const clothingItemRoutes = require("./routes/clothingItem"); // Import clothing 
 const userRoutes = require("./routes/users"); // Import the users routes
 const { NOT_FOUND } = require("./utils/errors");
 const { login, createUser } = require("./controllers/users"); // Import controllers
+require("dotenv").config();
 
 const { PORT = 3001 } = process.env;
 const app = express();
 
 // Connect to MongoDB
-connectToDatabase()
+const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/wtwr_db";
+connectToDatabase(uri)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => {
     console.error("Failed to connect to MongoDB", err);
