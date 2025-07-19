@@ -27,6 +27,9 @@ const auth = (req, res, next) => {
       return res.status(UNAUTHORIZED).send({ message: "Invalid token" });
     }
 
+    // Log the decoded token for debugging
+    console.log("Decoded token:", decoded);
+
     // Ensure the decoded token contains the required fields
     if (!decoded || !decoded._id) {
       return res
@@ -41,8 +44,8 @@ const auth = (req, res, next) => {
       name: decoded.name || null, // Default to null if not provided
     };
 
-    // Log the decoded user for debugging
-    console.log("Decoded user:", req.user);
+    // Log req.user for debugging
+    console.log("req.user:", req.user);
 
     // Call the next middleware
     return next();
