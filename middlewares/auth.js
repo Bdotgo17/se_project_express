@@ -6,6 +6,9 @@ const auth = (req, res, next) => {
   try {
     const { authorization } = req.headers;
 
+    // Log the Authorization header for debugging
+    console.log("Authorization header:", authorization);
+
     // Check if the authorization header exists and starts with "Bearer "
     if (!authorization || !authorization.startsWith("Bearer ")) {
       return res
@@ -31,12 +34,15 @@ const auth = (req, res, next) => {
         .send({ message: "Invalid token payload" });
     }
 
-   // Set req.user with all required fields
-   req.user = {
-    _id: decoded._id,
-    email: decoded.email || null, // Default to null if not provided
-    name: decoded.name || null,  // Default to null if not provided
-  };
+    // Set req.user with all required fields
+    req.user = {
+      _id: decoded._id,
+      email: decoded.email || null, // Default to null if not provided
+      name: decoded.name || null, // Default to null if not provided
+    };
+
+    // Log the decoded user for debugging
+    console.log("Decoded user:", req.user);
 
     // Call the next middleware
     return next();
