@@ -16,7 +16,11 @@ const app = express();
 // Connect to MongoDB
 const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/wtwr_db";
 connectToDatabase(uri)
-  .then(() => console.log("Connected to MongoDB"))
+  .then(() => {
+    if (process.env.NODE_ENV !== "production") {
+      console.log("Connected to MongoDB");
+    }
+  })
   .catch((err) => {
     console.error("Failed to connect to MongoDB", err);
     process.exit(1); // Exit the application if the database connection fails
@@ -62,7 +66,7 @@ app.use((err, req, res) => {
     .status(err.status || 500)
     .send({ message: err.message || "Internal Server Error" });
 });
-
+// No additional code needed at $PLACEHOLDER$
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

@@ -1,2 +1,5 @@
-const JWT_SECRET = "your-secret-key"; // Replace with a secure key
+require("dotenv").config(); // Load environment variables from .env file
+
+const JWT_SECRET = process.env.JWT_SECRET || "default-secret-key"; // Use .env value or fallback
+
 module.exports = { JWT_SECRET };
