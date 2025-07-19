@@ -1,8 +1,7 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const cors = require("cors");
-const connectToDatabase = require("./db"); // Import the database connection function
 const morgan = require("morgan"); // Logging library (optional)
+const connectToDatabase = require("./db"); // Import the database connection function
 const auth = require("./middlewares/auth");
 const routes = require("./routes"); // Import centralized routes
 const clothingItemRoutes = require("./routes/clothingItem"); // Import clothing item routes
@@ -57,7 +56,9 @@ app.use((req, res) => {
 // Centralized error-handling middleware
 app.use((err, req, res) => {
   console.error(err.stack); // Log the error stack trace
-  res.status(err.status || 500).send({ message: err.message || "Internal Server Error" });
+  res
+    .status(err.status || 500)
+    .send({ message: err.message || "Internal Server Error" });
 });
 
 if (require.main === module) {

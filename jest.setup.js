@@ -1,4 +1,5 @@
 // Jest setup file
+/* global jest */
 /**
  * @jest-environment node
  */
