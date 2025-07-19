@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const morgan = require("morgan"); // Logging library (optional)
 const auth = require("./middlewares/auth");
 const routes = require("./routes"); // Import centralized routes
 const clothingItemRoutes = require("./routes/clothingItem"); // Import clothing item routes
@@ -21,6 +22,7 @@ mongoose
 
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
+app.use(morgan("dev")); // Add request logging (optional)
 
 // Example protected route
 app.get("/protected-route", auth, (req, res) => {
@@ -28,6 +30,11 @@ app.get("/protected-route", auth, (req, res) => {
     return res.status(401).json({ message: "Unauthorized" });
   }
   return res.send({ message: "Access granted", userId: req.user._id });
+});
+
+// Add a health check endpoint
+app.get("/health", (req, res) => {
+  res.send({ status: "OK" });
 });
 
 // Add routes for signing in and signing up
@@ -44,6 +51,12 @@ app.use("/", routes);
 
 app.use((req, res) => {
   res.status(NOT_FOUND).send({ message: "Requested resource not found" });
+});
+
+// Centralized error-handling middleware
+app.use((err, req, res) => {
+  console.error(err.stack); // Log the error stack trace
+  res.status(err.status || 500).send({ message: err.message || "Internal Server Error" });
 });
 
 if (require.main === module) {

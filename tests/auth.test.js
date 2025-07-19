@@ -8,7 +8,11 @@ describe("Auth Middleware", () => {
     const req = {
       headers: {
         authorization: `Bearer ${jwt.sign(
-          { _id: "5d8b8592978f8bd833ca8133", email: "test@example.com", name: "Test User" },
+          {
+            _id: "5d8b8592978f8bd833ca8133",
+            email: "test@example.com",
+            name: "Test User",
+          },
           JWT_SECRET
         )}`,
       },
@@ -38,6 +42,27 @@ describe("Auth Middleware", () => {
     expect(res.status).toHaveBeenCalledWith(401);
     expect(res.send).toHaveBeenCalledWith({
       message: "Authorization required",
+    });
+    expect(next).not.toHaveBeenCalled();
+  });
+
+  it("should return 401 if the token is invalid", () => {
+    const req = {
+      headers: {
+        authorization: "Bearer invalidtoken",
+      },
+    };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      send: jest.fn(),
+    };
+    const next = jest.fn();
+
+    auth(req, res, next);
+
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(res.send).toHaveBeenCalledWith({
+      message: "Invalid token",
     });
     expect(next).not.toHaveBeenCalled();
   });
