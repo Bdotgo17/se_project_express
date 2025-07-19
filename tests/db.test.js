@@ -1,10 +1,12 @@
 /* global jest, describe, it, expect */
 
 const mongoose = require("mongoose");
-const connectToDatabase = () => mongoose.connect("mongodb://localhost:27017/wtwr_db", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+
+const connectToDatabase = () =>
+  mongoose.connect("mongodb://localhost:27017/wtwr_db", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
 
 jest.mock("mongoose", () => ({
   connect: jest.fn(() => Promise.resolve()),
