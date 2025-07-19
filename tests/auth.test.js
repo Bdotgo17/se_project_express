@@ -8,7 +8,7 @@ describe("Auth Middleware", () => {
     const req = {
       headers: {
         authorization: `Bearer ${jwt.sign(
-          { _id: "5d8b8592978f8bd833ca8133" },
+          { _id: "5d8b8592978f8bd833ca8133", email: "test@example.com", name: "Test User" },
           JWT_SECRET
         )}`,
       },
@@ -20,6 +20,8 @@ describe("Auth Middleware", () => {
 
     expect(req.user).toBeDefined();
     expect(req.user._id).toBe("5d8b8592978f8bd833ca8133");
+    expect(req.user.email).toBe("test@example.com");
+    expect(req.user.name).toBe("Test User");
     expect(next).toHaveBeenCalled();
   });
 

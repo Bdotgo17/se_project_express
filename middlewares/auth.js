@@ -26,7 +26,11 @@ const auth = (req, res, next) => {
         .send({ message: "Invalid token payload" });
     }
 
-    req.user = { _id: decoded._id }; // Ensure req.user is set with the _id field
+    req.user = {
+      _id: decoded._id,
+      email: decoded.email, // Ensure all required fields are set
+      name: decoded.name,
+    };
 
     // Call the next middleware
     return next();
@@ -36,4 +40,4 @@ const auth = (req, res, next) => {
   }
 };
 
-module.exports = auth ;
+module.exports = auth;
