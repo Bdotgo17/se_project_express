@@ -26,8 +26,7 @@ const auth = (req, res, next) => {
         .send({ message: "Invalid token payload" });
     }
 
-    // Attach the payload to the request object
-    req.user = decoded;
+    req.user = { _id: decoded._id }; // Ensure req.user is set with the _id field
 
     // Call the next middleware
     return next();
