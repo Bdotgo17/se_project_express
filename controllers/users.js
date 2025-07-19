@@ -26,9 +26,12 @@ const login = async (req, res) => {
     // Find the user by email and validate the password
     const user = await User.findUserByCredentials(email, password);
 
-    // Create a JWT token
-    const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: "7d" });
-
+    const token = jwt.sign(
+      { _id: user._id, email: user.email, name: user.name },
+      JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+    
     // Send the token in the response body
     return res.status(200).send({ token });
   } catch (err) {
