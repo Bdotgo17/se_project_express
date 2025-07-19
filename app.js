@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const connectToDatabase = require("./db"); // Import the database connection function
 const morgan = require("morgan"); // Logging library (optional)
 const auth = require("./middlewares/auth");
 const routes = require("./routes"); // Import centralized routes
@@ -12,8 +13,8 @@ const { login, createUser } = require("./controllers/users"); // Import controll
 const { PORT = 3001 } = process.env;
 const app = express();
 
-mongoose
-  .connect("mongodb://127.0.0.1:27017/wtwr_db", {})
+// Connect to MongoDB
+connectToDatabase()
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => {
     console.error("Failed to connect to MongoDB", err);

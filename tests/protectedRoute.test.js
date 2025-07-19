@@ -22,7 +22,11 @@ describe("Protected Route", () => {
   it("should allow access with a valid token", async () => {
     // Generate a valid JWT with required fields
     const token = jwt.sign(
-      { _id: "5d8b8592978f8bd833ca8133", email: "test@example.com", name: "Test User" },
+      {
+        _id: "5d8b8592978f8bd833ca8133",
+        email: "test@example.com",
+        name: "Test User",
+      },
       JWT_SECRET
     );
 
@@ -58,7 +62,11 @@ describe("Protected Route", () => {
   it("should deny access with an expired token", async () => {
     // Generate an expired token
     const token = jwt.sign(
-      { _id: "5d8b8592978f8bd833ca8133", email: "test@example.com", name: "Test User" },
+      {
+        _id: "5d8b8592978f8bd833ca8133",
+        email: "test@example.com",
+        name: "Test User",
+      },
       JWT_SECRET,
       { expiresIn: "-1h" } // Token expired 1 hour ago
     );
