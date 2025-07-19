@@ -17,7 +17,12 @@ const auth = (req, res, next) => {
     const token = authorization.replace("Bearer ", "");
 
     // Verify the token
-    const decoded = jwt.verify(token, JWT_SECRET);
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (err) {
+      return res.status(UNAUTHORIZED).send({ message: "Invalid token" });
+    }
 
     // Ensure the decoded token contains the required fields
     if (!decoded || !decoded._id) {
@@ -26,11 +31,12 @@ const auth = (req, res, next) => {
         .send({ message: "Invalid token payload" });
     }
 
-    req.user = {
-      _id: decoded._id,
-      email: decoded.email, // Ensure all required fields are set
-      name: decoded.name,
-    };
+   // Set req.user with all required fields
+   req.user = {
+    _id: decoded._id,
+    email: decoded.email || null, // Default to null if not provided
+    name: decoded.name || null,  // Default to null if not provided
+  };
 
     // Call the next middleware
     return next();
