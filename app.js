@@ -30,12 +30,16 @@ app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 app.use(morgan("dev")); // Add request logging (optional)
 
-// Example protected route
 app.get("/protected-route", auth, (req, res) => {
-  if (!req.user || !req.user._id) {
+  if (!req.user || !req.user._id || !req.user.name || !req.user.role) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-  return res.send({ message: "Access granted", userId: req.user._id });
+  return res.send({
+    message: "Access granted",
+    userId: req.user._id,
+    name: req.user.name, // Include name
+    role: req.user.role, // Include role
+  });
 });
 
 // Add a health check endpoint

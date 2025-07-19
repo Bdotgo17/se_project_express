@@ -25,9 +25,11 @@ describe("Protected Route", () => {
       {
         _id: "5d8b8592978f8bd833ca8133",
         email: "test@example.com",
-        name: "Test User",
+        name: "Test User", // Add name
+        role: "user", // Add role
       },
-      JWT_SECRET
+      JWT_SECRET,
+      { expiresIn: "1h" }
     );
 
     // Send a request to the protected route with the token
@@ -39,6 +41,8 @@ describe("Protected Route", () => {
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty("message", "Access granted");
     expect(response.body).toHaveProperty("userId", "5d8b8592978f8bd833ca8133");
+    expect(response.body).toHaveProperty("name", "Test User"); // Assert name
+    expect(response.body).toHaveProperty("role", "user"); // Assert role
   });
 
   it("should deny access without a token", async () => {
@@ -65,7 +69,8 @@ describe("Protected Route", () => {
       {
         _id: "5d8b8592978f8bd833ca8133",
         email: "test@example.com",
-        name: "Test User",
+        name: "Test User", // Add name
+        role: "user", // Add role
       },
       JWT_SECRET,
       { expiresIn: "-1h" } // Token expired 1 hour ago

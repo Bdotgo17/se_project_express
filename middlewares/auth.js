@@ -6,6 +6,11 @@ const auth = (req, res, next) => {
   try {
     const { authorization } = req.headers;
 
+    // Ignore requests to /favicon.ico
+    if (req.path === "/favicon.ico") {
+      return next();
+    }
+
     // Log the Authorization header for debugging
     console.log("Authorization header:", authorization);
 
@@ -42,6 +47,7 @@ const auth = (req, res, next) => {
       _id: decoded._id,
       email: decoded.email || null, // Default to null if not provided
       name: decoded.name || null, // Default to null if not provided
+      role: decoded.role || "user", // Default to "user" if not provided
     };
 
     // Log req.user for debugging
