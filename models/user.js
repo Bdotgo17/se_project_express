@@ -22,28 +22,16 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true, // Password is required
-    minlength: 8, // Optional: Enforce a minimum password length
     select: false, // Prevent the password from being returned in queries by default
   },
   avatar: {
     type: String,
-    required: false,
+    required: true,
+    validate: {
+      validator: (v) => validator.isURL(v),
+      message: "You must enter a valid URL",
+    },
   },
-});
-
-// Pre-save hook to hash the password before saving
-userSchema.pre("save", async function preSaveHook(next) {
-  if (!this.isModified("password")) {
-    return next(); // Skip hashing if the password hasn't changed
-  }
-
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    return next();
-  } catch (err) {
-    return next(err); // Pass the error to the next middleware
-  }
 });
 
 // Custom method to find user by credentials

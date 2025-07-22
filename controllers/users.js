@@ -31,7 +31,7 @@ const login = async (req, res) => {
       JWT_SECRET,
       { expiresIn: "7d" }
     );
-    
+
     // Send the token in the response body
     return res.status(200).send({ token });
   } catch (err) {
@@ -45,19 +45,6 @@ const login = async (req, res) => {
     }
 
     // Handle all other errors
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .send({ message: "An error has occurred on the server" });
-  }
-};
-
-// GET /users - returns all users
-const getUsers = async (req, res) => {
-  try {
-    const users = await User.find({});
-    return res.status(OK).send(users);
-  } catch (err) {
-    console.error("Error fetching users:", err);
     return res
       .status(INTERNAL_SERVER_ERROR)
       .send({ message: "An error has occurred on the server" });
@@ -121,12 +108,17 @@ const updateUser = async (req, res) => {
 // POST /users - creates a new user
 const createUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, avatar } = req.body;
 
     // Hash the password before saving it to the database
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({ name, email, password: hashedPassword });
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      avatar,
+    });
 
     // Remove the password field from the response
     const userWithoutPassword = user.toObject();
@@ -137,6 +129,7 @@ const createUser = async (req, res) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      avatar: user.avatar,
     });
   } catch (err) {
     console.error("Error creating user:", err);
@@ -181,7 +174,6 @@ const getUserItems = async (req, res) => {
 };
 
 module.exports = {
-  getUsers,
   getCurrentUser,
   createUser,
   login,

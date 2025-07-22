@@ -51,10 +51,12 @@ app.get("/health", (req, res) => {
 app.post("/signin", login);
 app.post("/signup", createUser);
 
-// Connect the users routes
-app.use(auth); // Apply the auth middleware to all routes below this line
+app.use("/items", clothingItemRoutes);
+
+app.use(auth);
+
+// Protected routes
 app.use("/users", userRoutes);
-app.use("/clothing-items", clothingItemRoutes);
 
 // Centralized routes
 app.use("/", routes);
