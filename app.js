@@ -4,8 +4,8 @@ const morgan = require("morgan"); // Logging library (optional)
 const connectToDatabase = require("./db"); // Import the database connection function
 const auth = require("./middlewares/auth");
 const routes = require("./routes"); // Import centralized routes
-const clothingItemRoutes = require("./routes/clothingItem"); // Import clothing item routes
-const userRoutes = require("./routes/users"); // Import the users routes
+// const clothingItemRoutes = require("./routes/clothingItem"); // Import clothing item routes
+// const userRoutes = require("./routes/users"); // Import the users routes
 const { NOT_FOUND } = require("./utils/errors");
 const { login, createUser } = require("./controllers/users"); // Import controllers
 require("dotenv").config();
@@ -50,13 +50,6 @@ app.get("/health", (req, res) => {
 // Add routes for signing in and signing up
 app.post("/signin", login);
 app.post("/signup", createUser);
-
-app.use("/items", clothingItemRoutes);
-
-app.use(auth);
-
-// Protected routes
-app.use("/users", userRoutes);
 
 // Centralized routes
 app.use("/", routes);

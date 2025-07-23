@@ -13,11 +13,15 @@ const router = express.Router();
 // Route for fetching all clothing items
 router.get("/", getClothingItems);
 
+// Apply authentication middleware to the routes below
+router.use(auth);
+
 // Route for creating a new clothing item
 router.post("/", createClothingItem);
 
 // Route for deleting a clothing item by ID
 router.delete("/:itemId", auth, deleteClothingItem);
+
 // Route for liking an item
 router.put("/:itemId/likes", likeItem);
 
