@@ -51,6 +51,10 @@ app.get("/health", (req, res) => {
 app.post("/signin", login);
 app.post("/signup", createUser);
 
+app.get("/", (req, res) => {
+  res.send({ message: "Welcome to the API!" });
+});
+
 // Centralized routes
 app.use("/", routes);
 
