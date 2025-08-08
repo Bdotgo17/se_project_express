@@ -12,6 +12,7 @@ require("dotenv").config();
 
 const { PORT = 3001 } = process.env;
 const app = express();
+const Item = require("./models/Items"); // Adjust the path if necessary
 
 // Connect to MongoDB
 const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/wtwr_db";
@@ -75,5 +76,49 @@ if (require.main === module) {
     console.log(`Server is running on port ${PORT}`);
   });
 }
+
+app.put("/items/:id/likes", auth, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Find the item by ID and update its likes array
+    const updatedItem = await Item.findByIdAndUpdate(
+      id,
+      { $addToSet: { likes: req.user._id } }, // Add the user's ID to the likes array if it doesn't already exist
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedItem) {
+      return res.status(404).send({ message: "Item not found" });
+    }
+
+    return res.status(200).send(updatedItem);
+  } catch (err) {
+    console.error("Error adding like:", err);
+    return res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
+app.delete("/items/:id/likes", auth, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Find the item by ID and update its likes array
+    const updatedItem = await Item.findByIdAndUpdate(
+      id,
+      { $pull: { likes: req.user._id } }, // Remove the user's ID from the likes array
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedItem) {
+      return res.status(404).send({ message: "Item not found" });
+    }
+
+    return res.status(200).send(updatedItem);
+  } catch (err) {
+    console.error("Error removing like:", err);
+    return res.status(500).send({ message: "Internal Server Error" });
+  }
+});
 
 module.exports = app;
