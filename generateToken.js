@@ -8,4 +8,5 @@ const token = jwt.sign(
   { expiresIn: "1h" } // Token expiration time
 );
 
+// Log the token to use it
 console.log("Generated Token:", token);

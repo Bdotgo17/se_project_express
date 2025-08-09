@@ -19,7 +19,7 @@ const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/wtwr_db";
 connectToDatabase(uri)
   .then(() => {
     if (process.env.NODE_ENV !== "production") {
-      console.log("Connected to MongoDB");
+      console.log("Connected to MongoDB in development mode");
     }
   })
   .catch((err) => {

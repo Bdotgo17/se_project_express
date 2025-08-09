@@ -22,9 +22,6 @@ describe("Auth Middleware", () => {
 
     auth(req, res, next);
 
-    // Log req.user for debugging
-    console.log("req.user:", req.user);
-
     expect(req.user).toBeDefined();
     expect(req.user._id).toBe("5d8b8592978f8bd833ca8133");
     expect(req.user.email).toBe("test@example.com");
