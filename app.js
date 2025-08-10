@@ -56,6 +56,10 @@ app.get("/", (req, res) => {
   res.send({ message: "Welcome to the API!" });
 });
 
+app.get("/user-data", (req, res) => {
+  res.json({ id: 1, name: "John Doe" });
+});
+
 // Centralized routes
 app.use("/", routes);
 
