@@ -31,6 +31,11 @@ app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 app.use(morgan("dev")); // Add request logging (optional)
 
+// Add routes for signing in and signing up
+app.post("/signin", login);
+app.post("/signup", createUser);
+
+// Add a protected route to demonstrate authentication
 app.get("/protected-route", auth, (req, res) => {
   if (!req.user || !req.user._id || !req.user.name || !req.user.role) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -48,16 +53,12 @@ app.get("/health", (req, res) => {
   res.send({ status: "OK" });
 });
 
-// Add routes for signing in and signing up
-app.post("/signin", login);
-app.post("/signup", createUser);
+app.get("/user-data", (req, res) => {
+  res.json({ id: 1, name: "John Doe" });
+});
 
 app.get("/", (req, res) => {
   res.send({ message: "Welcome to the API!" });
-});
-
-app.get("/user-data", (req, res) => {
-  res.json({ id: 1, name: "John Doe" });
 });
 
 // Centralized routes
