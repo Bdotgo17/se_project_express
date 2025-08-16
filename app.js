@@ -2,10 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan"); // Logging library (optional)
 const connectToDatabase = require("./db"); // Import the database connection function
+const clothingItemRoutes = require("./routes/clothingItem");
 const auth = require("./middlewares/auth");
 const routes = require("./routes"); // Import centralized routes
-// const clothingItemRoutes = require("./routes/clothingItem"); // Import clothing item routes
-// const userRoutes = require("./routes/users"); // Import the users routes
 const { NOT_FOUND } = require("./utils/errors");
 const { login, createUser } = require("./controllers/users"); // Import controllers
 require("dotenv").config();
@@ -15,16 +14,13 @@ const app = express();
 const Item = require("./models/Items"); // Adjust the path if necessary
 
 // Connect to MongoDB
-const uri = process.env.MONGODB_URI || "mongodb://localhost:27017/wtwr_db";
-connectToDatabase(uri)
-  .then(() => {
-    if (process.env.NODE_ENV !== "production") {
-      console.log("Connected to MongoDB in development mode");
-    }
-  })
+connectToDatabase(
+  process.env.MONGODB_URI || "mongodb://localhost:27017/wtwr_db"
+)
+  .then(() => console.log("Connected to MongoDB"))
   .catch((err) => {
     console.error("Failed to connect to MongoDB", err);
-    process.exit(1); // Exit the application if the database connection fails
+    process.exit(1);
   });
 
 app.use(cors()); // Enable CORS for all routes
@@ -53,16 +49,10 @@ app.get("/health", (req, res) => {
   res.send({ status: "OK" });
 });
 
-app.get("/user-data", (req, res) => {
-  res.json({ id: 1, name: "John Doe" });
-});
-
-app.get("/", (req, res) => {
-  res.send({ message: "Welcome to the API!" });
-});
-
 // Centralized routes
 app.use("/", routes);
+
+app.use("/clothing-items", clothingItemRoutes);
 
 app.use((req, res) => {
   res.status(NOT_FOUND).send({ message: "Requested resource not found" });
@@ -75,6 +65,15 @@ app.use((err, req, res) => {
     .status(err.status || 500)
     .send({ message: err.message || "Internal Server Error" });
 });
+
+app.get("/user-data", (req, res) => {
+  res.json({ id: 1, name: "John Doe" });
+});
+
+app.get("/", (req, res) => {
+  res.send({ message: "Welcome to the API!" });
+});
+
 // No additional code needed at $PLACEHOLDER$
 if (require.main === module) {
   app.listen(PORT, () => {
@@ -125,5 +124,22 @@ app.delete("/items/:id/likes", auth, async (req, res) => {
     return res.status(500).send({ message: "Internal Server Error" });
   }
 });
+
+app.get("/clothing-items", async (req, res) => {
+  try {
+    const clothingItems = await Item.find(); // Fetch all items from the database
+    res.status(200).send(clothingItems);
+  } catch (err) {
+    console.error("Error fetching clothing items:", err);
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+});
+
+// Start the server
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
 
 module.exports = app;

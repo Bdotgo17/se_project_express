@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-// filepath: /Users/adam/se_project_express/controllers/clothingItems.js
 const ClothingItem = require("../models/clothingItem");
 const {
   BAD_REQUEST,
@@ -10,7 +9,6 @@ const {
   CREATED,
   FORBIDDEN,
 } = require("../utils/errors");
-// Removed duplicate import of NOT_FOUND
 
 const getClothingItems = async (req, res) => {
   try {
@@ -28,8 +26,8 @@ const createClothingItem = async (req, res) => {
   try {
     const { name, weather, imageUrl } = req.body;
     const owner = req.user._id; // Use the user ID from the middleware
-    const item = await ClothingItem.create({ name, weather, imageUrl, owner });
-    return res.status(CREATED).send(item);
+    const newItem = await ClothingItem.create({ name, weather, imageUrl, owner });
+    return res.status(CREATED).send(newItem);
   } catch (err) {
     console.error(err);
     if (err.name === "ValidationError") {
@@ -87,7 +85,7 @@ const likeItem = async (req, res) => {
   const { itemId } = req.params;
 
   try {
-    const item = await ClothingItem.findByIdAndUpdate(
+    const updatedItem = await ClothingItem.findByIdAndUpdate(
       itemId,
       { $addToSet: { likes: req.user._id } }, // Add user ID to likes array if not already present
       { new: true } // Return the updated document
@@ -96,7 +94,7 @@ const likeItem = async (req, res) => {
       error.statusCode = NOT_FOUND;
       throw error;
     });
-    return res.status(OK).send(item);
+    return res.status(OK).send(updatedItem);
   } catch (err) {
     console.error(err);
     if (err.name === "CastError") {
@@ -113,9 +111,11 @@ const likeItem = async (req, res) => {
 
 // DELETE /items/:itemId/likes — unlike an item
 const dislikeItem = async (req, res) => {
+  const { itemId } = req.params;
+
   try {
-    const item = await ClothingItem.findByIdAndUpdate(
-      req.params.itemId,
+    const updatedItem = await ClothingItem.findByIdAndUpdate(
+      itemId,
       { $pull: { likes: req.user._id } }, // Remove user ID from likes array
       { new: true } // Return the updated document
     ).orFail(() => {
@@ -123,7 +123,7 @@ const dislikeItem = async (req, res) => {
       error.statusCode = NOT_FOUND;
       throw error;
     });
-    return res.status(OK).send(item);
+    return res.status(OK).send(updatedItem);
   } catch (err) {
     console.error(err);
     if (err.name === "CastError") {
