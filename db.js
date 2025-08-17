@@ -1,7 +1,10 @@
 const mongoose = require("mongoose");
 
-const connectToDatabase = (uri) =>
-   mongoose.connect(uri) // Return the promise directly
-;
+function connectToDatabase(uri = process.env.MONGODB_URI) {
+  return mongoose.connect(uri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+}
 
 module.exports = connectToDatabase;

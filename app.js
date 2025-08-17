@@ -9,12 +9,12 @@ const { NOT_FOUND } = require("./utils/errors");
 const { login, createUser } = require("./controllers/users"); // Import controllers
 require("dotenv").config();
 
-const { PORT = 3001 } = process.env;
+const { PORT = 9000 } = process.env;
 const app = express();
 const Item = require("./models/Items"); // Adjust the path if necessary
 
 // Connect to MongoDB
-connectToDatabase(process.env.MONGO_URI)
+connectToDatabase(process.env.MONGODB_URI)
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Failed to connect to MongoDB:", err));
 
@@ -69,7 +69,6 @@ app.get("/", (req, res) => {
   res.send({ message: "Welcome to the API!" });
 });
 
-// No additional code needed at $PLACEHOLDER$
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
@@ -130,12 +129,15 @@ app.get("/clothing-items", async (req, res) => {
   }
 });
 
-// Start the server
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-}
+app.get("/items", async (req, res) => {
+  try {
+    const items = await Item.find();
+    res.status(200).send(items);
+  } catch (err) {
+    console.error("Error fetching items:", err);
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+});
 
 app.get("/test", (req, res) => {
   res.send({ message: "Server is running" });
