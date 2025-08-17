@@ -14,14 +14,9 @@ const app = express();
 const Item = require("./models/Items"); // Adjust the path if necessary
 
 // Connect to MongoDB
-connectToDatabase(
-  process.env.MONGODB_URI || "mongodb://localhost:27017/wtwr_db"
-)
+connectToDatabase(process.env.MONGO_URI)
   .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => {
-    console.error("Failed to connect to MongoDB", err);
-    process.exit(1);
-  });
+  .catch((err) => console.error("Failed to connect to MongoDB:", err));
 
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
@@ -141,5 +136,9 @@ if (require.main === module) {
     console.log(`Server is running on port ${PORT}`);
   });
 }
+
+app.get("/test", (req, res) => {
+  res.send({ message: "Server is running" });
+});
 
 module.exports = app;
