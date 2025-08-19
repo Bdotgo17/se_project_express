@@ -12,6 +12,7 @@ require("dotenv").config();
 const { PORT = 9000 } = process.env;
 const app = express();
 const Item = require("./models/Items"); // Adjust the path if necessary
+const ClothingItem = require("./models/clothingItem"); // Use the correct model
 
 // Connect to MongoDB
 connectToDatabase(process.env.MONGODB_URI)
@@ -49,6 +50,9 @@ app.use("/", routes);
 
 app.use("/clothing-items", clothingItemRoutes);
 
+// Mount clothing item routes at /items (not /clothing-items)
+app.use("/items", clothingItemRoutes);
+
 app.use((req, res) => {
   res.status(NOT_FOUND).send({ message: "Requested resource not found" });
 });
@@ -74,70 +78,6 @@ if (require.main === module) {
     console.log(`Server is running on port ${PORT}`);
   });
 }
-
-app.put("/items/:id/likes", auth, async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    // Find the item by ID and update its likes array
-    const updatedItem = await Item.findByIdAndUpdate(
-      id,
-      { $addToSet: { likes: req.user._id } }, // Add the user's ID to the likes array if it doesn't already exist
-      { new: true } // Return the updated document
-    );
-
-    if (!updatedItem) {
-      return res.status(404).send({ message: "Item not found" });
-    }
-
-    return res.status(200).send(updatedItem);
-  } catch (err) {
-    console.error("Error adding like:", err);
-    return res.status(500).send({ message: "Internal Server Error" });
-  }
-});
-
-app.delete("/items/:id/likes", auth, async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    // Find the item by ID and update its likes array
-    const updatedItem = await Item.findByIdAndUpdate(
-      id,
-      { $pull: { likes: req.user._id } }, // Remove the user's ID from the likes array
-      { new: true } // Return the updated document
-    );
-
-    if (!updatedItem) {
-      return res.status(404).send({ message: "Item not found" });
-    }
-
-    return res.status(200).send(updatedItem);
-  } catch (err) {
-    console.error("Error removing like:", err);
-    return res.status(500).send({ message: "Internal Server Error" });
-  }
-});
-
-app.get("/clothing-items", async (req, res) => {
-  try {
-    const clothingItems = await Item.find(); // Fetch all items from the database
-    res.status(200).send(clothingItems);
-  } catch (err) {
-    console.error("Error fetching clothing items:", err);
-    res.status(500).send({ message: "Internal Server Error" });
-  }
-});
-
-app.get("/items", async (req, res) => {
-  try {
-    const items = await Item.find();
-    res.status(200).send(items);
-  } catch (err) {
-    console.error("Error fetching items:", err);
-    res.status(500).send({ message: "Internal Server Error" });
-  }
-});
 
 app.get("/test", (req, res) => {
   res.send({ message: "Server is running" });
