@@ -27,7 +27,12 @@ const createClothingItem = async (req, res) => {
   try {
     const { name, weather, imageUrl } = req.body;
     const owner = req.user._id; // Use the user ID from the middleware
-    const newItem = await ClothingItem.create({ name, weather, imageUrl, owner });
+    const newItem = await ClothingItem.create({
+      name,
+      weather,
+      imageUrl,
+      owner,
+    });
     return res.status(CREATED).send(newItem);
   } catch (err) {
     console.error(err);
