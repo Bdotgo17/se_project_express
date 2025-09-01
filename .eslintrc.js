@@ -8,7 +8,7 @@ module.exports = {
     {
       env: {
         node: true,
-        jest: true
+        jest: true,
       },
       files: [".eslintrc.{js,cjs}"],
       parserOptions: {
@@ -22,5 +22,6 @@ module.exports = {
   },
   rules: {
     "no-underscore-dangle": ["error", { allow: ["_id"] }],
+    "no-unused-vars": ["error", { argsIgnorePattern: "next" }],
   },
 };

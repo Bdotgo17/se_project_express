@@ -1,5 +1,9 @@
 const express = require("express");
 const {
+  clothingItemValidation,
+  idValidation,
+} = require("../middlewares/validation");
+const {
   getClothingItems,
   createClothingItem,
   deleteClothingItem,
@@ -17,15 +21,15 @@ router.get("/", getClothingItems);
 router.use(auth);
 
 // Route for creating a new clothing item
-router.post("/", createClothingItem);
+router.post("/", clothingItemValidation, createClothingItem);
 
 // Route for deleting a clothing item by ID
-router.delete("/:itemId", auth, deleteClothingItem);
+router.delete("/:itemId", idValidation, deleteClothingItem);
 
 // Route for liking an item
-router.put("/:itemId/likes", likeItem);
+router.put("/:itemId/likes", idValidation, likeItem);
 
 // Route for unliking an item
-router.delete("/:itemId/likes", dislikeItem);
+router.delete("/:itemId/likes", idValidation, dislikeItem);
 
 module.exports = router;

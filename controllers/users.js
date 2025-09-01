@@ -12,15 +12,21 @@ const {
 const { JWT_SECRET } = require("../utils/config"); // Import the secret key
 const ClothingItem = require("../models/clothingItem");
 
-const login = async (req, res) => {
+const {
+  BadRequestError,
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ConflictError,
+} = require("../utils/customErrors");
+
+const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
     // Check if email and password are provided
     if (!email || !password) {
-      return res
-        .status(BAD_REQUEST)
-        .send({ message: "Email and password are required" });
+      return next(new BadRequestError("Email and password are required"));
     }
 
     // Find the user by email and validate the password
@@ -39,74 +45,57 @@ const login = async (req, res) => {
 
     // Handle authentication errors
     if (err.name === "UnauthorizedError") {
-      return res
-        .status(UNAUTHORIZED)
-        .send({ message: "Invalid email or password" });
+      return next(new UnauthorizedError("Invalid email or password"));
     }
-
-    // Handle all other errors
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .send({ message: "An error has occurred on the server" });
+    next(err); // Pass other errors to centralized handler
   }
 };
 
 // GET /users/me - returns the current user
-const getCurrentUser = async (req, res) => {
+const getCurrentUser = async (req, res, next) => {
   try {
-    // Access the user ID from the req.user object (set by the auth middleware)
     const userId = req.user._id;
-
-    // Find the user by their ID
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(NOT_FOUND).send({ message: "User not found" });
+      return next(new NotFoundError("User not found"));
     }
 
-    // Return the current user's data
     return res.status(OK).send(user);
   } catch (err) {
     console.error("Error fetching current user:", err);
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .send({ message: "An error occurred on the server" });
+    next(err); // Pass error to centralized handler
   }
 };
 
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
   const { name, avatar } = req.body;
-  const userId = req.user._id; // Get the user ID from the auth middleware
+  const userId = req.user._id;
 
   try {
-    // Update the user and enable validation
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { name, avatar },
-      { new: true, runValidators: true } // Return the updated document and enable validation
+      { new: true, runValidators: true }
     );
 
     if (!updatedUser) {
-      return res.status(NOT_FOUND).send({ message: "User not found" });
+      return next(new NotFoundError("User not found"));
     }
 
     return res.status(OK).send(updatedUser);
   } catch (err) {
     console.error("Error updating user:", err);
 
-    // Handle validation errors
     if (err.name === "ValidationError") {
-      return res.status(BAD_REQUEST).send({ message: "Invalid data passed" });
+      return next(new BadRequestError("Invalid data passed"));
     }
-
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .send({ message: "An error occurred on the server" });
+    next(err); // Pass other errors to centralized handler
   }
 };
 
 // POST /users - creates a new user
-const createUser = async (req, res) => {
+const createUser = async (req, res, next) => {
   try {
     const { name, email, password, avatar } = req.body;
 
@@ -136,40 +125,32 @@ const createUser = async (req, res) => {
 
     // Handle duplicate email error
     if (err.code === 11000) {
-      return res
-        .status(400)
-        .send({ message: "User with this email already exists" });
+      return next(new ConflictError("User with this email already exists"));
     }
 
     // Handle validation errors
     if (err.name === "ValidationError") {
-      return res.status(BAD_REQUEST).send({ message: "Invalid data passed" });
+      return next(new BadRequestError("Invalid data passed"));
     }
 
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .send({ message: "Error creating user" });
+    next(err); // Pass other errors to centralized handler
   }
 };
 
-const getUserItems = async (req, res) => {
+const getUserItems = async (req, res, next) => {
   const { userId } = req.params;
 
   try {
     const items = await ClothingItem.find({ owner: userId });
 
     if (!items || items.length === 0) {
-      return res
-        .status(NOT_FOUND)
-        .send({ message: "No items found for this user" });
+      return next(new NotFoundError("No items found for this user"));
     }
 
-    return res.status(200).send(items);
+    return res.status(OK).send(items);
   } catch (err) {
     console.error("Error fetching user items:", err);
-    return res
-      .status(INTERNAL_SERVER_ERROR)
-      .send({ message: "An error occurred on the server" });
+    next(err); // Pass error to centralized handler
   }
 };
 

@@ -14,6 +14,12 @@ const app = express();
 const Item = require("./models/Items"); // Adjust the path if necessary
 const ClothingItem = require("./models/clothingItem"); // Use the correct model
 
+const errorHandler = require("./middlewares/error-handler");
+
+const { errors } = require("celebrate");
+
+const { requestLogger, errorLogger } = require("./middlewares/logger");
+
 // Connect to MongoDB
 connectToDatabase(process.env.MONGODB_URI)
   .then(() => console.log("Connected to MongoDB"))
@@ -23,10 +29,11 @@ app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 app.use(morgan("dev")); // Add request logging (optional)
 
+app.use(requestLogger);
+
 // Add routes for signing in and signing up
 app.post("/signin", login);
 app.post("/signup", createUser);
-
 // Add a protected route to demonstrate authentication
 app.get("/protected-route", auth, (req, res) => {
   if (!req.user || !req.user._id || !req.user.name || !req.user.role) {
@@ -39,48 +46,39 @@ app.get("/protected-route", auth, (req, res) => {
     role: req.user.role, // Include role
   });
 });
-
 // Add a health check endpoint
 app.get("/health", (req, res) => {
   res.send({ status: "OK" });
 });
+app.get("/user-data", (req, res) => {
+  res.json({ id: 1, name: "John Doe" });
+});
+app.get("/", (req, res) => {
+  res.send({ message: "Welcome to the API!" });
+});
+app.get("/test", (req, res) => {
+  res.send({ message: "Server is running" });
+});
 
 // Centralized routes
 app.use("/", routes);
-
 app.use("/clothing-items", clothingItemRoutes);
-
-// Mount clothing item routes at /items (not /clothing-items)
 app.use("/items", clothingItemRoutes);
+
+app.use(errorLogger);
 
 app.use((req, res) => {
   res.status(NOT_FOUND).send({ message: "Requested resource not found" });
 });
 
-// Centralized error-handling middleware
-app.use((err, req, res) => {
-  console.error(err.stack); // Log the error stack trace
-  res
-    .status(err.status || 500)
-    .send({ message: err.message || "Internal Server Error" });
-});
+app.use(errors()); // Celebrate error handler
 
-app.get("/user-data", (req, res) => {
-  res.json({ id: 1, name: "John Doe" });
-});
-
-app.get("/", (req, res) => {
-  res.send({ message: "Welcome to the API!" });
-});
+app.use(errorHandler);
 
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
 }
-
-app.get("/test", (req, res) => {
-  res.send({ message: "Server is running" });
-});
 
 module.exports = app;
