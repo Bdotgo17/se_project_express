@@ -33,6 +33,13 @@ app.use(morgan("dev")); // Add request logging (optional)
 
 app.use(requestLogger);
 
+// remove after passing review
+app.get("/crash-test", () => {
+  setTimeout(() => {
+    throw new Error("Server will crash now");
+  }, 0);
+});
+
 // Add routes for signing in and signing up
 app.post("/signin", login);
 app.post("/signup", createUser);

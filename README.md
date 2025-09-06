@@ -13,3 +13,11 @@ Before committing your code, make sure you edit the file `sprint.txt` in the roo
 2. This project uses an api to run tests against Postman and Github.
 
 3. This project uses api, Postman and Github and Compass from Mongoose. 
+
+## Accessing the Application
+
+**Deployed project domain:**  
+[https://wtwrtriple.crabdance.com](https://wtwrtriple.crabdance.com)
+
+**Frontend GitHub repository:**  
+https://github.com/Bdotgo17/se_project_react.git
