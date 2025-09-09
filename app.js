@@ -3,29 +3,23 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan"); // Logging library (optional)
+const { errors } = require("celebrate");
+
 const connectToDatabase = require("./db"); // Import the database connection function
 const clothingItemRoutes = require("./routes/clothingItem");
 const auth = require("./middlewares/auth");
 const routes = require("./routes"); // Import centralized routes
 const { NOT_FOUND } = require("./utils/errors");
 const { login, createUser } = require("./controllers/users"); // Import controllers
-require("dotenv").config();
 
 const { PORT = 9000 } = process.env;
 const app = express();
-const Item = require("./models/Items"); // Adjust the path if necessary
-const ClothingItem = require("./models/clothingItem"); // Use the correct model
-
 const errorHandler = require("./middlewares/error-handler");
+const { logger, requestLogger, errorLogger } = require("./middlewares/logger");
 
-const { errors } = require("celebrate");
-
-const { requestLogger, errorLogger } = require("./middlewares/logger");
-
-// Connect to MongoDB
 connectToDatabase(process.env.MONGODB_URI)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("Failed to connect to MongoDB:", err));
+  .then(() => logger.info("Connected to MongoDB"))
+  .catch((err) => logger.error("Failed to connect to MongoDB:", err));
 
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
@@ -86,7 +80,7 @@ app.use(errorHandler);
 
 if (require.main === module) {
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server is running on port ${PORT}`);
+    logger.info(`Server is running on port ${PORT}`);
   });
 }
 

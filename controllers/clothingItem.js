@@ -2,23 +2,14 @@ const mongoose = require("mongoose");
 
 const ClothingItem = require("../models/clothingItem");
 
-const {
-  BAD_REQUEST,
-  NOT_FOUND,
-  INTERNAL_SERVER_ERROR,
-  OK,
-  CREATED,
-  FORBIDDEN,
-} = require("../utils/errors");
+const { OK, CREATED } = require("../utils/errors");
 
-const {
-  BadRequestError,
-  UnauthorizedError,
-  ForbiddenError,
-  NotFoundError,
-  ConflictError,
-} = require("../utils/customErrors");
+const BadRequestError = require("../utils/BadRequestError");
+const ForbiddenError = require("../utils/ForbiddenError");
+const NotFoundError = require("../utils/NotFoundError");
+const { logger } = require("../middlewares/logger"); // Add at the top if not already imported
 
+// GET /items - returns all clothing items
 const getClothingItems = async (req, res, next) => {
   try {
     const clothingItems = await ClothingItem.find();
@@ -29,7 +20,7 @@ const getClothingItems = async (req, res, next) => {
         new BadRequestError("Invalid query format for clothing items")
       );
     }
-    next(err); // Pass other errors to the centralized handler
+    return next(err); // Pass other errors to the centralized handler
   }
 };
 
@@ -46,11 +37,13 @@ const createClothingItem = async (req, res, next) => {
     });
     return res.status(CREATED).send(newItem);
   } catch (err) {
-    console.error(err);
+    logger.error(`Error creating item: ${err}`);
     if (err.name === "ValidationError") {
-      return next(new BadRequestError("Invalid data passed to create a clothing item"));
+      return next(
+        new BadRequestError("Invalid data passed to create a clothing item")
+      );
     }
-    next(err); // Pass other errors to the centralized handler
+    return next(err); // Pass other errors to the centralized handler
   }
 };
 
@@ -72,18 +65,19 @@ const deleteClothingItem = async (req, res, next) => {
     }
 
     if (item.owner.toString() !== userId) {
-      return next(new ForbiddenError("You do not have permission to delete this item"));
+      return next(
+        new ForbiddenError("You do not have permission to delete this item")
+      );
     }
 
     await item.deleteOne();
     return res.status(OK).json({ message: "Item deleted" });
   } catch (err) {
-    console.error("Error deleting item:", err);
-
+    logger.error(`Error deleting item: ${err}`);
     if (err.name === "CastError") {
       return next(new BadRequestError("Invalid item ID"));
     }
-    next(err); // Pass other errors to the centralized handler
+    return next(err); // Pass other errors to the centralized handler
   }
 };
 
@@ -101,11 +95,11 @@ const likeItem = async (req, res, next) => {
     });
     return res.status(OK).send(updatedItem);
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     if (err.name === "CastError") {
       return next(new BadRequestError("Invalid item ID"));
     }
-    next(err); // Pass other errors to the centralized handler
+    return next(err); // Pass other errors to the centralized handler
   }
 };
 
@@ -123,11 +117,11 @@ const dislikeItem = async (req, res, next) => {
     });
     return res.status(OK).send(updatedItem);
   } catch (err) {
-    console.error(err);
+    logger.error(err);
     if (err.name === "CastError") {
       return next(new BadRequestError("Invalid item ID"));
     }
-    next(err); // Pass other errors to the centralized handler
+    return next(err); // Pass other errors to the centralized handler
   }
 };
 

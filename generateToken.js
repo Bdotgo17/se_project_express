@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { JWT_SECRET } = require("./utils/config"); // Ensure this matches your app's secret
+const { logger } = require("./middlewares/logger");
 
 // Generate a token
 const token = jwt.sign(
@@ -8,5 +9,4 @@ const token = jwt.sign(
   { expiresIn: "1h" } // Token expiration time
 );
 
-// Log the token to use it
-console.log("Generated Token:", token);
+logger.info(`Generated token: ${token}`);

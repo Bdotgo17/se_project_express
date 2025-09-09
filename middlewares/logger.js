@@ -1,5 +1,5 @@
-const winston = require('winston');
-const expressWinston = require('express-winston');
+const winston = require("winston");
+const expressWinston = require("express-winston");
 
 // Custom formatter for console logs
 const messageFormat = winston.format.combine(
@@ -10,22 +10,28 @@ const messageFormat = winston.format.combine(
   )
 );
 
-// Request logger
-const requestLogger = expressWinston.logger({
+const logger = winston.createLogger({
   transports: [
-    new winston.transports.Console({ format: messageFormat }),
-    new winston.transports.File({ filename: 'request.log', format: winston.format.json() }),
+    new winston.transports.File({ filename: "combined.log" }),
+    new winston.transports.Console({
+      format: messageFormat, // Use your custom format for console
+    }),
   ],
+  format: winston.format.simple(), // This is used for file logs
 });
 
-// Error logger
+const requestLogger = expressWinston.logger({
+  transports: [new winston.transports.File({ filename: "request.log" })],
+  format: winston.format.json(),
+});
+
 const errorLogger = expressWinston.errorLogger({
-  transports: [
-    new winston.transports.File({ filename: 'error.log', format: winston.format.json() }),
-  ],
+  transports: [new winston.transports.File({ filename: "error.log" })],
+  format: winston.format.json(),
 });
 
 module.exports = {
+  logger,
   requestLogger,
   errorLogger,
 };

@@ -13,9 +13,9 @@ const auth = (req, res, next) => {
 
     // Check if the authorization header exists and starts with "Bearer "
     if (!authorization || !authorization.startsWith("Bearer ")) {
-      return res
-        .status(UNAUTHORIZED)
-        .send({ message: "Authorization required" });
+      const err = new Error("Authorization required");
+      err.status = UNAUTHORIZED;
+      return next(err);
     }
 
     // Extract the token from the header
@@ -26,14 +26,16 @@ const auth = (req, res, next) => {
     try {
       decoded = jwt.verify(token, JWT_SECRET);
     } catch (err) {
-      return res.status(UNAUTHORIZED).send({ message: "Invalid token" });
+      const error = new Error("Invalid token");
+      error.status = UNAUTHORIZED;
+      return next(error);
     }
 
     // Ensure the decoded token contains the required fields
     if (!decoded || !decoded._id) {
-      return res
-        .status(UNAUTHORIZED)
-        .send({ message: "Invalid token payload" });
+      const err = new Error("Invalid token payload");
+      err.status = UNAUTHORIZED;
+      return next(err);
     }
 
     // Set req.user with all required fields
@@ -47,8 +49,8 @@ const auth = (req, res, next) => {
     // Call the next middleware
     return next();
   } catch (err) {
-    // Return a 401 error if the token is invalid
-    return res.status(UNAUTHORIZED).send({ message: "Invalid token" });
+    err.status = UNAUTHORIZED;
+    return next(err);
   }
 };
 

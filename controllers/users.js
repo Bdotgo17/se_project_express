@@ -1,24 +1,15 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
-const {
-  BAD_REQUEST,
-  UNAUTHORIZED,
-  NOT_FOUND,
-  INTERNAL_SERVER_ERROR,
-  OK,
-  CREATED,
-} = require("../utils/errors");
+const { OK, CREATED } = require("../utils/errors");
 const { JWT_SECRET } = require("../utils/config"); // Import the secret key
 const ClothingItem = require("../models/clothingItem");
 
-const {
-  BadRequestError,
-  UnauthorizedError,
-  ForbiddenError,
-  NotFoundError,
-  ConflictError,
-} = require("../utils/customErrors");
+const BadRequestError = require("../utils/BadRequestError");
+const UnauthorizedError = require("../utils/UnauthorizedError");
+const NotFoundError = require("../utils/NotFoundError");
+const ConflictError = require("../utils/ConflictError");
+const { logger } = require("../middlewares/logger");
 
 const login = async (req, res, next) => {
   try {
@@ -41,13 +32,13 @@ const login = async (req, res, next) => {
     // Send the token in the response body
     return res.status(200).send({ token });
   } catch (err) {
-    console.error("Error during login:", err);
+    logger.error(`Error during login: ${err}`);
 
     // Handle authentication errors
     if (err.name === "UnauthorizedError") {
       return next(new UnauthorizedError("Invalid email or password"));
     }
-    next(err); // Pass other errors to centralized handler
+    return next(err); // Pass other errors to centralized handler
   }
 };
 
@@ -63,8 +54,8 @@ const getCurrentUser = async (req, res, next) => {
 
     return res.status(OK).send(user);
   } catch (err) {
-    console.error("Error fetching current user:", err);
-    next(err); // Pass error to centralized handler
+    logger.error(`Error fetching current user: ${err}`);
+    return next(err); // Pass error to centralized handler
   }
 };
 
@@ -85,12 +76,12 @@ const updateUser = async (req, res, next) => {
 
     return res.status(OK).send(updatedUser);
   } catch (err) {
-    console.error("Error updating user:", err);
+    logger.error(`Error updating user: ${err}`);
 
     if (err.name === "ValidationError") {
       return next(new BadRequestError("Invalid data passed"));
     }
-    next(err); // Pass other errors to centralized handler
+    return next(err); // Pass other errors to centralized handler
   }
 };
 
@@ -121,7 +112,7 @@ const createUser = async (req, res, next) => {
       avatar: user.avatar,
     });
   } catch (err) {
-    console.error("Error creating user:", err);
+    logger.error(`Error creating user: ${err}`);
 
     // Handle duplicate email error
     if (err.code === 11000) {
@@ -133,7 +124,7 @@ const createUser = async (req, res, next) => {
       return next(new BadRequestError("Invalid data passed"));
     }
 
-    next(err); // Pass other errors to centralized handler
+    return next(err); // Pass other errors to centralized handler
   }
 };
 
@@ -149,8 +140,8 @@ const getUserItems = async (req, res, next) => {
 
     return res.status(OK).send(items);
   } catch (err) {
-    console.error("Error fetching user items:", err);
-    next(err); // Pass error to centralized handler
+    logger.error(`Error fetching user items: ${err}`);
+    return next(err); // Pass error to centralized handler
   }
 };
 

@@ -1,31 +1,12 @@
-const { Joi, celebrate } = require('celebrate');
-const validator = require('validator');
-
-// You can now define and export your validation schemas and celebrate middlewares here.
-// Example:
-// const userValidation = celebrate({
-//   body: Joi.object().keys({
-//     email: Joi.string().email().required(),
-//     password: Joi.string().min(8).required(),
-//   }),
-// });
-
-// module.exports = { userValidation };
-
-// Custom Joi extension for URL validation using validator
-const joiUrl = Joi.string().custom((value, helpers) => {
-  if (!validator.isURL(value)) {
-    return helpers.error('string.uri');
-  }
-  return value;
-}, 'URL Validation');
+const { Joi, celebrate } = require("celebrate");
+const validator = require("validator");
 
 // Custom URL validator for Joi
 const validateURL = (value, helpers) => {
   if (validator.isURL(value)) {
     return value;
   }
-  return helpers.error('string.uri');
+  return helpers.error("string.uri");
 };
 
 // 1. Clothing item creation validation
@@ -36,7 +17,7 @@ const clothingItemValidation = celebrate({
       "string.max": 'The maximum length of the "name" field is 30',
       "string.empty": 'The "name" field must be filled in',
     }),
-    weather: Joi.string().required(),
+    weather: Joi.string().valid("hot", "warm", "cold").required(),
     imageUrl: Joi.string().required().custom(validateURL).messages({
       "string.empty": 'The "imageUrl" field must be filled in',
       "string.uri": 'The "imageUrl" field must be a valid url',
@@ -83,10 +64,13 @@ const idValidation = celebrate({
   }),
 });
 
-const validateId = celebrate({
-  params: Joi.object().keys({
-    itemId: Joi.string().hex().length(24).required(),
-    userId: Joi.string().hex().length(24).required(),
+const updateUserValidation = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    avatar: Joi.string().required().custom(validateURL).messages({
+      "string.empty": 'The "avatar" field must be filled in',
+      "string.uri": 'The "avatar" field must be a valid url',
+    }),
   }),
 });
 
@@ -95,5 +79,5 @@ module.exports = {
   userCreationValidation,
   loginValidation,
   idValidation,
-  validateId,
+  updateUserValidation,
 };

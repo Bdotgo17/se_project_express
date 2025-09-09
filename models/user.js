@@ -35,7 +35,10 @@ const userSchema = new mongoose.Schema({
 });
 
 // Custom method to find user by credentials
-userSchema.statics.findUserByCredentials = async function (email, password) {
+userSchema.statics.findUserByCredentials = async function findUserByCredentials(
+  email,
+  password
+) {
   const user = await this.findOne({ email }).select("+password"); // Explicitly select the password field
   if (!user) {
     const error = new Error("Invalid email or password");
