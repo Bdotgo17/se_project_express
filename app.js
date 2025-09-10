@@ -4,9 +4,9 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan"); // Logging library (optional)
 const { errors } = require("celebrate");
+const helmet = require("helmet");
 
 const connectToDatabase = require("./db"); // Import the database connection function
-const clothingItemRoutes = require("./routes/clothingItem");
 const auth = require("./middlewares/auth");
 const routes = require("./routes"); // Import centralized routes
 const { NOT_FOUND } = require("./utils/errors");
@@ -22,12 +22,12 @@ const {
 } = require("./middlewares/validation");
 
 const apiLimiter = require("./middlewares/rateLimiter");
-const helmet = require("helmet");
-app.use(helmet()); // Add Helmet middleware for security headers
 
 connectToDatabase(process.env.MONGODB_URI)
   .then(() => logger.info("Connected to MongoDB"))
   .catch((err) => logger.error("Failed to connect to MongoDB:", err));
+
+app.use(helmet()); // Add Helmet middleware for security headers
 
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
@@ -46,7 +46,7 @@ app.get("/crash-test", () => {
 
 // Add routes for signing in and signing up
 app.post("/signin", loginValidation, login); // <-- Add loginValidation here
-app.post("/signup", userCreationValidation, createUser); 
+app.post("/signup", userCreationValidation, createUser);
 // Add a protected route to demonstrate authentication
 app.get("/protected-route", auth, (req, res) => {
   if (!req.user || !req.user._id || !req.user.name || !req.user.role) {
