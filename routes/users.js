@@ -11,8 +11,14 @@ const {
 } = require("../controllers/users");
 
 const router = express.Router();
+
+// Route to get the current user
+router.get("/me", auth, getCurrentUser);
+
+// Route to update the current user's profile
 router.patch(
   "/me",
+  auth, // <--- Add this!
   (req, res, next) => {
     console.log("PATCH /users/me body:", req.body);
     next();
@@ -20,11 +26,6 @@ router.patch(
   updateUserValidation,
   updateUser
 );
-
-// Route to get the current user
-router.get("/me", auth, getCurrentUser);
-
-// Route to update the current user's profile
 
 // Get items for a user by ID
 router.get("/:userId/items", idValidation, getUserItems);

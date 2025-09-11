@@ -39,9 +39,9 @@ app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 app.use(morgan("dev")); // Add request logging (optional)
 
-//app.use(requestLogger);
+app.use(requestLogger);
 
-//app.use(apiLimiter); // <--- Add this line here
+app.use(apiLimiter); // <--- Add this line here
 
 // remove after passing review
 app.get("/crash-test", () => {
