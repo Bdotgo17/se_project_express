@@ -20,13 +20,6 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((err, req, res, next) => {
-  if (err.joi) {
-    console.log("Celebrate error:", err);
-  }
-  next(err);
-});
-
 const errorHandler = require("./middlewares/error-handler");
 const { logger, requestLogger, errorLogger } = require("./middlewares/logger");
 const {
@@ -89,13 +82,20 @@ app.get("/test", (req, res) => {
 // Centralized routes
 app.use("/", routes);
 
+app.use((err, req, res, next) => {
+  if (err.joi) {
+    console.log("Celebrate error:", err);
+  }
+  next(err);
+});
+
+app.use(errors()); // Celebrate error handler
+
 app.use(errorLogger);
 
 app.use((req, res, next) => {
   next(new NotFoundError("Requested resource not found"));
 });
-
-app.use(errors()); // Celebrate error handler
 
 app.use(errorHandler);
 
