@@ -9,11 +9,17 @@ const helmet = require("helmet");
 const connectToDatabase = require("./db"); // Import the database connection function
 const auth = require("./middlewares/auth");
 const routes = require("./routes"); // Import centralized routes
-const { NOT_FOUND } = require("./utils/errors");
+const { NotFoundError } = require("./utils/errors"); // Make sure this is imported
 const { login, createUser } = require("./controllers/users"); // Import controllers
 
 const { PORT = 9100 } = process.env;
 const app = express();
+
+app.use((req, res, next) => {
+  console.log(`[${req.method}] ${req.originalUrl} body:`, req.body);
+  next();
+});
+
 const errorHandler = require("./middlewares/error-handler");
 const { logger, requestLogger, errorLogger } = require("./middlewares/logger");
 const {
@@ -33,9 +39,9 @@ app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 app.use(morgan("dev")); // Add request logging (optional)
 
-app.use(requestLogger);
+//app.use(requestLogger);
 
-app.use(apiLimiter); // <--- Add this line here
+//app.use(apiLimiter); // <--- Add this line here
 
 // remove after passing review
 app.get("/crash-test", () => {
@@ -79,7 +85,7 @@ app.use("/", routes);
 app.use(errorLogger);
 
 app.use((req, res, next) => {
-  next({ status: NOT_FOUND, message: "Requested resource not found" }); // Pass error to centralized handler
+  next(new NotFoundError("Requested resource not found"));
 });
 
 app.use(errors()); // Celebrate error handler

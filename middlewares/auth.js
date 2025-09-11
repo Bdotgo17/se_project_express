@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { UNAUTHORIZED } = require("../utils/errors");
+const { UnauthorizedError } = require("../utils/errors"); // <-- Import your custom error
 const { JWT_SECRET } = require("../utils/config");
 
 const auth = (req, res, next) => {
@@ -13,9 +13,7 @@ const auth = (req, res, next) => {
 
     // Check if the authorization header exists and starts with "Bearer "
     if (!authorization || !authorization.startsWith("Bearer ")) {
-      const err = new Error("Authorization required");
-      err.status = UNAUTHORIZED;
-      return next(err);
+      return next(new UnauthorizedError("Authorization required"));
     }
 
     // Extract the token from the header
@@ -26,16 +24,12 @@ const auth = (req, res, next) => {
     try {
       decoded = jwt.verify(token, JWT_SECRET);
     } catch (err) {
-      const error = new Error("Invalid token");
-      error.status = UNAUTHORIZED;
-      return next(error);
+      return next(new UnauthorizedError("Invalid token"));
     }
 
     // Ensure the decoded token contains the required fields
     if (!decoded || !decoded._id) {
-      const err = new Error("Invalid token payload");
-      err.status = UNAUTHORIZED;
-      return next(err);
+      return next(new UnauthorizedError("Invalid token payload"));
     }
 
     // Set req.user with all required fields
@@ -46,11 +40,9 @@ const auth = (req, res, next) => {
       role: decoded.role || "user", // Default to "user" if not provided
     };
 
-    // Call the next middleware
     return next();
   } catch (err) {
-    err.status = UNAUTHORIZED;
-    return next(err);
+    return next(new UnauthorizedError("Authorization required"));
   }
 };
 

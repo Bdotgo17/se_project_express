@@ -67,8 +67,7 @@ const idValidation = celebrate({
 const updateUserValidation = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
-    avatar: Joi.string().required().custom(validateURL).messages({
-      "string.empty": 'The "avatar" field must be filled in',
+    avatar: Joi.string().custom(validateURL).messages({
       "string.uri": 'The "avatar" field must be a valid url',
     }),
   }),
