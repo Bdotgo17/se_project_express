@@ -20,6 +20,13 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use((err, req, res, next) => {
+  if (err.joi) {
+    console.log("Celebrate error:", err);
+  }
+  next(err);
+});
+
 const errorHandler = require("./middlewares/error-handler");
 const { logger, requestLogger, errorLogger } = require("./middlewares/logger");
 const {
