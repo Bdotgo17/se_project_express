@@ -89,6 +89,11 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
+app.use((err, req, res, next) => {
+  console.log("GENERIC ERROR:", err);
+  next(err);
+});
+
 app.use(errors()); // Celebrate error handler
 
 app.use(errorLogger);
