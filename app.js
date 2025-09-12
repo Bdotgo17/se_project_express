@@ -16,7 +16,6 @@ const { PORT = 9100 } = process.env;
 const app = express();
 
 app.use((req, res, next) => {
-  console.log(`[${req.method}] ${req.originalUrl} body:`, req.body);
   next();
 });
 
@@ -84,13 +83,12 @@ app.use("/", routes);
 
 app.use((err, req, res, next) => {
   if (err.joi) {
-    console.log("Celebrate error:", err);
+    logger.error("Celebrate validation error:", err);
   }
   next(err);
 });
 
 app.use((err, req, res, next) => {
-  console.log("GENERIC ERROR:", err);
   next(err);
 });
 
