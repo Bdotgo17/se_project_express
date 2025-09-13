@@ -93,12 +93,16 @@ const createUser = async (req, res, next) => {
     // Hash the password before saving it to the database
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    logger.info("Creating user:", { name, email, avatar }); // <-- Add this line
+
     const user = await User.create({
       name,
       email,
       password: hashedPassword,
       avatar,
     });
+
+    logger.info("User created:", user); // <-- And this line
 
     // Remove the password field from the response
     const userWithoutPassword = user.toObject();
@@ -114,13 +118,11 @@ const createUser = async (req, res, next) => {
   } catch (err) {
     logger.error(`Error creating user: ${err}`);
 
-    // Handle duplicate email error
-    if (err.code === 11000) {
+    if (err && err.code === 11000) {
       return next(new ConflictError("User with this email already exists"));
     }
 
-    // Handle validation errors
-    if (err.name === "ValidationError") {
+    if (err && err.name === "ValidationError") {
       return next(new BadRequestError("Invalid data passed"));
     }
 
@@ -145,10 +147,21 @@ const getUserItems = async (req, res, next) => {
   }
 };
 
+const getAllUsers = async (req, res, next) => {
+  try {
+    const users = await User.find({}, "-password"); // Exclude password field
+    return res.status(OK).send(users);
+  } catch (err) {
+    logger.error(`Error fetching users: ${err}`);
+    return next(err);
+  }
+};
+
 module.exports = {
   getCurrentUser,
   createUser,
   login,
   updateUser,
   getUserItems,
+  getAllUsers,
 };

@@ -8,12 +8,15 @@ const {
   getCurrentUser,
   updateUser,
   getUserItems,
+  getAllUsers,
 } = require("../controllers/users");
 
 const router = express.Router();
 
 // Route to get the current user
 router.get("/me", auth, getCurrentUser);
+
+router.get("/", getAllUsers);
 
 // Route to update the current user's profile
 router.patch(

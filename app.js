@@ -15,10 +15,6 @@ const { login, createUser } = require("./controllers/users"); // Import controll
 const { PORT = 9100 } = process.env;
 const app = express();
 
-app.use((req, res, next) => {
-  next();
-});
-
 const errorHandler = require("./middlewares/error-handler");
 const { logger, requestLogger, errorLogger } = require("./middlewares/logger");
 const {
@@ -33,13 +29,10 @@ connectToDatabase(process.env.MONGODB_URI)
   .catch((err) => logger.error("Failed to connect to MongoDB:", err));
 
 app.use(helmet()); // Add Helmet middleware for security headers
-
 app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 app.use(morgan("dev")); // Add request logging (optional)
-
 app.use(requestLogger);
-
 app.use(apiLimiter); // <--- Add this line here
 
 // remove after passing review
@@ -52,6 +45,7 @@ app.get("/crash-test", () => {
 // Add routes for signing in and signing up
 app.post("/signin", loginValidation, login); // <-- Add loginValidation here
 app.post("/signup", userCreationValidation, createUser);
+
 // Add a protected route to demonstrate authentication
 app.get("/protected-route", auth, (req, res) => {
   if (!req.user || !req.user._id || !req.user.name || !req.user.role) {
@@ -64,6 +58,7 @@ app.get("/protected-route", auth, (req, res) => {
     role: req.user.role, // Include role
   });
 });
+
 // Add a health check endpoint
 app.get("/health", (req, res) => {
   res.send({ status: "OK" });
@@ -81,25 +76,13 @@ app.get("/test", (req, res) => {
 // Centralized routes
 app.use("/", routes);
 
-app.use((err, req, res, next) => {
-  if (err.joi) {
-    logger.error("Celebrate validation error:", err);
-  }
-  next(err);
-});
-
-app.use((err, req, res, next) => {
-  next(err);
+app.use((req, res, next) => {
+  next(new NotFoundError("Requested resource not found"));
 });
 
 app.use(errors()); // Celebrate error handler
 
 app.use(errorLogger);
-
-app.use((req, res, next) => {
-  next(new NotFoundError("Requested resource not found"));
-});
-
 app.use(errorHandler);
 
 if (require.main === module) {
