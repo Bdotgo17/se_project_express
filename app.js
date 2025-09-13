@@ -9,7 +9,7 @@ const helmet = require("helmet");
 const connectToDatabase = require("./db"); // Import the database connection function
 const auth = require("./middlewares/auth");
 const routes = require("./routes"); // Import centralized routes
-const NotFoundError = require("./utils/errors"); // Make sure this is imported
+const NotFoundError = require("./utils/NotFoundError");
 const { login, createUser } = require("./controllers/users"); // Import controllers
 
 const { PORT = 9100 } = process.env;
