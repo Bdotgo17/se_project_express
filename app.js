@@ -81,7 +81,6 @@ app.use((req, res, next) => {
 });
 
 app.use(errors()); // Celebrate error handler
-
 app.use(errorLogger);
 app.use(errorHandler);
 
